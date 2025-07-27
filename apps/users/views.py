@@ -1,6 +1,5 @@
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions, status, mixins, viewsets
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model
 from .serializers import (
@@ -8,7 +7,8 @@ from .serializers import (
     PatientProfileSerializer,
     DoctorProfileSerializer,
     RegisterSerializer,
-    ChangePasswordSerializer
+    ChangePasswordSerializer,
+    CustomTokenObtainPairSerializer,
 )
 from .models import PatientProfile, DoctorProfile
 
@@ -31,6 +31,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     Получение JWT токена (вход)
     POST /api/users/login/
     """
+    serializer_class = CustomTokenObtainPairSerializer
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
         if response.status_code == 200:
@@ -89,7 +90,11 @@ class UserViewSet(generics.ListAPIView):
     permission_classes = [permissions.IsAdminUser]
 
 
-class PatientProfileViewSet(generics.RetrieveUpdateAPIView):
+class PatientProfileViewSet(
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet
+):
     """
     Профиль пациента
     GET, PUT /api/users/patients/<id>/
@@ -104,7 +109,11 @@ class PatientProfileViewSet(generics.RetrieveUpdateAPIView):
         return [permissions.IsAuthenticated()]
 
 
-class DoctorProfileViewSet(generics.RetrieveUpdateAPIView):
+class DoctorProfileViewSet(
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet
+):
     """
     Профиль врача
     GET, PUT /api/users/doctors/<id>/
@@ -112,6 +121,9 @@ class DoctorProfileViewSet(generics.RetrieveUpdateAPIView):
     queryset = DoctorProfile.objects.all()
     serializer_class = DoctorProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def __str__(self):
+        return f"{self.user.username} profile"
 
     def get_permissions(self):
         if self.request.method == 'PUT':

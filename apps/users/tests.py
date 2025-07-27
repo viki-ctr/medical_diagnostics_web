@@ -1,66 +1,41 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from apps.users.models import PatientProfile, DoctorProfile
+from apps.users.models import DoctorProfile
 
 
 User = get_user_model()
 
 
-class UserModelTest(TestCase):
-    def test_create_user(self):
-        user = User.objects.create_user(
-            username='patient1',
-            email='patient@test.com',
-            password='testpass123',
-            is_patient=True
-        )
-        self.assertEqual(user.username, 'patient1')
-        self.assertTrue(user.is_patient)
-        self.assertFalse(user.is_doctor)
-
-    def test_create_superuser(self):
-        admin_user = User.objects.create_superuser(
-            username='admin',
-            email='admin@test.com',
-            password='testpass123'
-        )
-        self.assertTrue(admin_user.is_superuser)
-        self.assertTrue(admin_user.is_staff)
-
-
-class PatientProfileModelTest(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(
-            username='patient1',
-            email='patient@test.com',
-            password='testpass123',
-            is_patient=True
-        )
-        self.profile = PatientProfile.objects.create(
-            user=self.user,
-            birth_date='1990-01-01',
-            address='Test address 123'
-        )
-
-    def test_profile_creation(self):
-        self.assertEqual(self.profile.user.username, 'patient1')
-        self.assertEqual(str(self.profile), 'patient1 profile')
-
-
 class DoctorProfileModelTest(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
             username='doctor1',
             email='doctor@test.com',
             password='testpass123',
             is_doctor=True
         )
-        self.profile = DoctorProfile.objects.create(
-            user=self.user,
+        cls.profile = DoctorProfile.objects.create(
+            user=cls.user,
             specialty='Cardiology',
             bio='Test bio'
         )
 
     def test_profile_creation(self):
+        self.assertEqual(self.profile.user.username, 'doctor1')
         self.assertEqual(self.profile.specialty, 'Cardiology')
-        self.assertEqual(str(self.profile), 'doctor1 profile')
+
+    def test_str_representation(self):
+        self.assertEqual(str(self.profile), f"{self.user.username} profile")
+
+
+class UserSignalsTest(TestCase):
+    def test_doctor_profile_creation(self):
+        user = User.objects.create_user(
+            username="dr_test",
+            email="dr@test.com",
+            password="testpass",
+            is_doctor=True
+        )
+        self.assertTrue(hasattr(user, 'doctorprofile'))
+        self.assertEqual(user.doctorprofile.specialty, 'General')

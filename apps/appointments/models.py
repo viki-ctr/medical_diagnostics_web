@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 from apps.users.models import User, DoctorProfile
 from apps.services.models import Service
 
@@ -18,3 +19,39 @@ class Appointment(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     notes = models.TextField(blank=True)
     results = models.FileField(upload_to='results/', blank=True, null=True)
+
+    @property
+    def results_url(self):
+        return self.results.url if self.results else None
+
+
+class DoctorSchedule(models.Model):
+    doctor = models.OneToOneField(
+        DoctorProfile,
+        on_delete=models.CASCADE,
+        related_name='schedule'
+    )
+    working_days = ArrayField(
+        models.IntegerField(),
+        default=list,
+        help_text='Дни недели (0-6, где 0 - понедельник)'
+    )
+    working_hours = models.JSONField(
+        default=dict,
+        help_text='{"start": "09:00", "end": "18:00"}'
+    )
+    breaks = models.JSONField(
+        default=list,
+        help_text='[{"start": "13:00", "end": "14:00"}]'
+    )
+    vacation_dates = models.JSONField(
+        default=list,
+        help_text='[{"start": "2023-08-01", "end": "2023-08-14"}]'
+    )
+
+    class Meta:
+        verbose_name = 'Расписание врача'
+        verbose_name_plural = 'Расписания врачей'
+
+    def __str__(self):
+        return f"Расписание {self.doctor.user.get_full_name()}"

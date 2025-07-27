@@ -1,7 +1,5 @@
 from django.urls import path
 from . import views
-from django.conf import settings
-from django.conf.urls.static import static
 from .views import (
     HomePageContentAPIView,
     AboutPageAPIView,
@@ -16,12 +14,10 @@ from .views import (
 
 app_name = 'core'
 
+
 urlpatterns = [
-
     path('', views.HomeView.as_view(), name='home'),
-
     path('about/', views.AboutView.as_view(), name='about'),
-
     path('faq/', views.FAQListView.as_view(), name='faq_list'),
     path('faq/category/<slug:slug>/', views.FAQCategoryView.as_view(), name='faq_category'),
 
@@ -33,4 +29,4 @@ urlpatterns = [
     path('testimonials/', TestimonialListAPIView.as_view(), name='testimonial-list'),
     path('site-settings/', SiteSettingAPIView.as_view(), name='site-settings'),
     path('site-content/', SiteContentAPIView.as_view(), name='site-content'),
-    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]

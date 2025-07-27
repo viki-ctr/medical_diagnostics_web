@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0"><i class="fas fa-calendar-plus me-2"></i>Новая запись</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="appointment-form">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <h4 class="mb-3"><i class="fas fa-user-md me-2"></i>Выбор врача</h4>
+                            <select class="form-select" id="doctor-select" name="doctor" required>
+                                <option value="">-- Выберите врача --</option>
+                                {% for doctor in doctors %}
+                                <option value="{{ doctor.id }}">
+                                    Др. {{ doctor.user.get_full_name }} ({{ doctor.specialty }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="mb-3"><i class="fas fa-procedures me-2"></i>Выбор услуги</h4>
+                            <select class="form-select" id="service-select" name="service" required>
+                                <option value="">-- Сначала выберите врача --</option>
+                                {% if selected_service %}
+                                <option value="{{ selected_service.id }}" selected>
+                                    {{ selected_service.name }} ({{ selected_service.price }} ₽)
+                                </option>
+                                {% endif %}
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="mb-3"><i class="fas fa-clock me-2"></i>Выбор даты и времени</h4>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <input type="date" class="form-control" id="appointment-date" name="date" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <select class="form-select" id="time-slot-select" name="time" disabled required>
+                                        <option value="">-- Сначала выберите дату --</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="mb-3"><i class="fas fa-comment me-2"></i>Комментарий</h4>
+                            <textarea class="form-control" name="notes" rows="3" 
+                                      placeholder="Ваши пожелания или дополнительная информация"></textarea>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-check me-2"></i>Подтвердить запись
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Динамическая загрузка услуг при выборе врача
+    const doctorSelect = document.getElementById('doctor-select');
+    const serviceSelect = document.getElementById('service-select');
+    
+    doctorSelect.addEventListener('change', function() {
+        const doctorId = this.value;
+        if (doctorId) {
+            fetch(`/api/services/doctors/${doctorId}/services/`)
+                .then(response => response.json())
+                .then(data => {
+                    serviceSelect.innerHTML = '<option value="">-- Выберите услугу --</option>';
+                    data.forEach(service => {
+                        const option = document.createElement('option');
+                        option.value = service.id;
+                        option.textContent = `${service.name} (${service.price} ₽)`;
+                        serviceSelect.appendChild(option);
+                    });
+                });
+        } else {
+            serviceSelect.innerHTML = '<option value="">-- Сначала выберите врача --</option>';
+        }
+    });
+
+    // Динамическая загрузка доступных слотов
+    const dateInput = document.getElementById('appointment-date');
+    const timeSelect = document.getElementById('time-slot-select');
+    
+    dateInput.addEventListener('change', function() {
+        const doctorId = doctorSelect.value;
+        const serviceId = serviceSelect.value;
+        const date = this.value;
+        
+        if (doctorId && serviceId && date) {
+            fetch(`/api/appointments/available-slots/?doctor=${doctorId}&service=${serviceId}&date=${date}`)
+                .then(response => response.json())
+                .then(data => {
+                    timeSelect.innerHTML = '<option value="">-- Выберите время --</option>';
+                    if (data.slots && data.slots.length > 0) {
+                        timeSelect.disabled = false;
+                        data.slots.forEach(slot => {
+                            const option = document.createElement('option');
+                            option.value = slot;
+                            option.textContent = slot;
+                            timeSelect.appendChild(option);
+                        });
+                    } else {
+                        timeSelect.disabled = true;
+                        timeSelect.innerHTML = '<option value="">Нет доступных слотов</option>';
+                    }
+                });
+        } else {
+            timeSelect.disabled = true;
+            timeSelect.innerHTML = '<option value="">-- Сначала выберите дату --</option>';
+        }
+    });
+});
+</script>
+{% endblock %}

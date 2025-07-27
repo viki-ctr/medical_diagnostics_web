@@ -3,7 +3,7 @@ from .models import Service, ServiceCategory
 
 
 class ServiceCategorySerializer(serializers.ModelSerializer):
-    service_count = serializers.SerializerMethodField()
+    services_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = ServiceCategory
@@ -12,7 +12,7 @@ class ServiceCategorySerializer(serializers.ModelSerializer):
             'name',
             'slug',
             'description',
-            'service_count'
+            'services_count'
         ]
 
     def get_service_count(self, obj):
@@ -26,21 +26,7 @@ class ServiceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Service
-        fields = [
-            'id',
-            'name',
-            'category',
-            'category_name',
-            'description',
-            'short_description',
-            'price',
-            'duration',
-            'duration_formatted',
-            'preparation',
-            'image_url',
-            'is_available',
-            'slug'
-        ]
+        fields = ['id', 'name', 'price', 'duration', 'category']
         extra_kwargs = {
             'slug': {'read_only': True}
         }

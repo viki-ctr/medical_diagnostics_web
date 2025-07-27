@@ -7,12 +7,10 @@ from .views import (
 )
 
 router = DefaultRouter()
-router.register(r'appointments', AppointmentViewSet, basename='appointment')
+router.register(r'appointments', AppointmentViewSet, basename='appointments')
 
 urlpatterns = [
-    path('doctors/<int:doctor_id>/schedule/',
-         DoctorScheduleAPIView.as_view(),
-         name='doctor-schedule'),
+    path('doctors/<int:pk>/schedule/', DoctorScheduleAPIView.as_view(), name='doctor-schedule'),
     path('available-slots/',
          AvailableTimeSlotsAPIView.as_view(),
          name='available-slots'),
