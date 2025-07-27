@@ -1,18 +1,21 @@
+version: '3.10'
+
 services:
   db:
     image: postgres:13
     environment:
       POSTGRES_DB: ${NAME}
-      POSTGRES_USER: $USER}
+      POSTGRES_USER: ${USER}
       POSTGRES_PASSWORD: ${PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
+    restart: unless-stopped
 
   web:
     build: .
-    command: gunicorn --bind 0.0.0.0:8000 config.wsgi:application
+    command: python -m gunicorn --bind 0.0.0.0:8000 config.wsgi:application
     volumes:
       - .:/app
     ports:
@@ -20,8 +23,9 @@ services:
     depends_on:
       - db
     environment:
-      - DATABASE_URL=postgres://${USER}:${PASSWORD}@db:5432/${NAME}
-      - SECRET_KEY=${SECRET_KEY}
+      DATABASE_URL: postgres://${USER}:${PASSWORD}@db:5432/${NAME}
+      SECRET_KEY: ${SECRET_KEY}
+    restart: unless-stopped
 
   nginx:
     image: nginx:latest
@@ -32,6 +36,7 @@ services:
       - ./static:/app/static
     depends_on:
       - web
+    restart: unless-stopped
 
 volumes:
   postgres_data:
