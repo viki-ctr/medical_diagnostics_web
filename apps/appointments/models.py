@@ -1,5 +1,5 @@
 from django.db import models
-from apps.users.models import CustomUser, DoctorProfile
+from apps.users.models import User, DoctorProfile
 from apps.services.models import Service
 
 
@@ -11,7 +11,7 @@ class Appointment(models.Model):
         ('cancelled', 'Cancelled'),
     ]
 
-    patient = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    patient = models.ForeignKey(User, on_delete=models.CASCADE)
     doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE)
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     appointment_date = models.DateTimeField()

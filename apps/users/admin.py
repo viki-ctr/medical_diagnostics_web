@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, PatientProfile, DoctorProfile
+from .models import PatientProfile, DoctorProfile
 
 from django.contrib.auth import get_user_model
 
@@ -55,5 +55,4 @@ class DoctorProfileAdmin(admin.ModelAdmin):
     get_email.short_description = 'Email'
 
 
-admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)

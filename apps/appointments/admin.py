@@ -44,7 +44,7 @@ class AppointmentAdmin(admin.ModelAdmin):
     )
 
     def patient_info(self, obj):
-        url = reverse("admin:accounts_customuser_change", args=[obj.patient.id])
+        url = reverse("admin:users_user_change", args=[obj.patient.id])
         return format_html('<a href="{}">{}</a>', url, obj.patient.username)
 
     patient_info.short_description = 'Patient'
