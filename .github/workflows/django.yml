@@ -57,10 +57,14 @@ jobs:
         DEBUG: "True"
 
     - name: Run tests
+      run: poetry run python manage.py test
       env:
         DATABASE_URL: postgres://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@postgres:5432/${{ secrets.POSTGRES_DB }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      run: poetry run python manage.py test
+        POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+        POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        POSTGRES_HOST: postgres
 
   deploy:
     runs-on: ubuntu-latest

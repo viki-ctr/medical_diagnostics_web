@@ -99,14 +99,17 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": os.getenv('POSTGRES_DB'),
+        "NAME": os.getenv('POSTGRES_DB', 'test_db'),
         "USER": os.getenv('POSTGRES_USER'),
         "PASSWORD": os.getenv('POSTGRES_PASSWORD'),
-        "HOST": os.getenv('POSTGRES_HOST'),
+        "HOST": os.getenv('POSTGRES_HOST', 'db'),
         "PORT": os.getenv('POSTGRES_PORT'),
         "OPTIONS": {
             'client_encoding': 'UTF8',
         },
+        'TEST': {
+            'NAME': 'test_' + os.getenv('POSTGRES_DB', 'test_db')
+        }
     }
 }
 
