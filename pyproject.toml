@@ -4,13 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Viktoria Andrushenka <vika.sapriko.9981@gmail.com>"]
 readme = "README.md"
-
-
-[tool.poetry.packages]
-includes = [
-    {include = "config", from = "."},
-    {include = "apps", from = "."}
-]
+package-mode = false
 
 
 [tool.poetry.dependencies]
