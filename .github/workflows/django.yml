@@ -48,6 +48,9 @@ jobs:
 
     - name: Run migrations
       run: poetry run python manage.py migrate
+      env:
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        DEBUG: "True"
 
     - name: Run tests
       env:
