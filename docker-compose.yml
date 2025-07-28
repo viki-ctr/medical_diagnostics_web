@@ -4,9 +4,9 @@ services:
   db:
     image: postgres:13
     environment:
-      POSTGRES_DB: ${NAME}
-      POSTGRES_USER: ${USER}
-      POSTGRES_PASSWORD: ${PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     ports:
@@ -23,7 +23,7 @@ services:
     depends_on:
       - db
     environment:
-      DATABASE_URL: postgres://${USER}:${PASSWORD}@db:5432/${NAME}
+      DATABASE_URL: postgres://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@postgres:5432/${{ secrets.POSTGRES_DB }}
       SECRET_KEY: ${SECRET_KEY}
     restart: unless-stopped
 

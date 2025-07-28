@@ -9,9 +9,9 @@ jobs:
       postgres:
         image: postgres:13
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
@@ -49,12 +49,16 @@ jobs:
     - name: Run migrations
       run: poetry run python manage.py migrate
       env:
+        POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+        POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
         DEBUG: "True"
 
     - name: Run tests
       env:
-        DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+        DATABASE_URL: postgres://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@postgres:5432/${{ secrets.POSTGRES_DB }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
       run: poetry run python manage.py test
 
