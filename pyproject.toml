@@ -5,10 +5,6 @@ description = ""
 authors = ["Viktoria Andrushenka <vika.sapriko.9981@gmail.com>"]
 readme = "README.md"
 
-[tool.poetry.packages]
-packages = [
-    { include = "medical_diagnostics_web" }
-]
 
 [tool.poetry.dependencies]
 python = "^3.13"
