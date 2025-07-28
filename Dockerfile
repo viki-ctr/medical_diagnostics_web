@@ -17,4 +17,6 @@ RUN poetry config virtualenvs.create false \
 
 COPY . .
 
+RUN python manage.py collectstatic --noinput
+
 CMD ["poetry", "run", "gunicorn", "--bind", "0.0.0.0:8000", "config.wsgi"]

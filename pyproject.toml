@@ -6,6 +6,13 @@ authors = ["Viktoria Andrushenka <vika.sapriko.9981@gmail.com>"]
 readme = "README.md"
 
 
+[tool.poetry.packages]
+includes = [
+    {include = "config", from = "."},
+    {include = "apps", from = "."}
+]
+
+
 [tool.poetry.dependencies]
 python = "^3.13"
 requests = "^2.32.4"
