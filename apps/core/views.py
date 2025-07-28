@@ -30,6 +30,7 @@ class HomeView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['home_content'] = HomePageContent.objects.filter(is_active=True).first()
         context['testimonials'] = Testimonial.objects.filter(is_featured=True)[:5]
+        context['site_settings'] = SiteSetting.objects.first()
         return context
 
 

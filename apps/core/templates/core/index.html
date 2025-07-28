@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if not home_content %}
+<div class="alert alert-warning">Контент главной страницы не найден</div>
+{% else %}
+<section class="hero-section" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{% if home_content.featured_image %}{{ home_content.featured_image.url }}{% else %}/static/images/default-bg.jpg{% endif %}');" loading="lazy">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-4">{{ home_content.main_title }}</h1>
+                <p class="lead">{{ home_content.main_description }}</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<section class="py-5">
+    <div class="container">
+        {% if home_content %}<h2 class="text-center mb-5">{{ home_content.services_title }}</h2>{% endif %}
+        <div class="row" id="services-container">
+            <div class="col-12 text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if testimonials %}
+<section class="py-5 bg-light">
+    <div class="container">
+        {% if home_content %}<h2 class="text-center mb-5">{{ home_content.testimonials_title }}</h2>{% endif %}
+        <div class="row">
+            {% for testimonial in testimonials %}
+            <div class="col-md-4 mb-4" itemscope itemtype="http://schema.org/Review">
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}

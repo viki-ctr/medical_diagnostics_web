@@ -2,9 +2,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-
-
-
 class AboutPage(models.Model):
     """
     Модель страницы 'О клинике'
@@ -14,6 +11,7 @@ class AboutPage(models.Model):
     mission = models.TextField(_('Миссия клиники'))
     values = models.TextField(_('Наши ценности'), help_text=_('забота, эффективность, отзывчивость'))
     updated_at = models.DateTimeField(_('Последнее обновление'), auto_now=True)
+    is_active = models.BooleanField(_('Активная страница'), default=True)
 
     class Meta:
         verbose_name = _('Страница "О клинике"')
@@ -25,6 +23,11 @@ class AboutPage(models.Model):
     def values_as_list(self):
         import re
         return [v.strip() for v in re.split(r'[,.]', self.values) if v.strip()]
+
+    def save(self, *args, **kwargs):
+        if self.is_active:
+            AboutPage.objects.exclude(pk=self.pk).update(is_active=False)
+        super().save(*args, **kwargs)
 
 
 class TeamMember(models.Model):
@@ -208,5 +211,6 @@ class SiteSetting(models.Model):
         return self.site_name
 
     def save(self, *args, **kwargs):
-        self.__class__.objects.exclude(id=self.id).delete()
+        if not self.pk:
+            self.__class__.objects.all().delete()
         super().save(*args, **kwargs)

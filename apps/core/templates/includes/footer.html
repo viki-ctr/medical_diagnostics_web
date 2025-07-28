@@ -1,0 +1,52 @@
+<footer class="bg-dark text-white py-4 mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <h5 class="mb-3">
+                    {{ site_settings.site_name|default:"МедДиагностика" }}
+                </h5>
+                <p>Современный медицинский центр с полным спектром диагностических услуг.</p>
+
+                <div class="social-links mt-3">
+                    {% if site_settings.facebook_url %}
+                    <a href="{{ site_settings.facebook_url }}" class="text-white me-2" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook-f"></i></a>
+                    {% endif %}
+                    {% if site_settings.instagram_url %}
+                    <a href="{{ site_settings.instagram_url }}" class="text-white me-2" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+                    {% endif %}
+                    {% if site_settings.telegram_url %}
+                    <a href="{{ site_settings.telegram_url }}" class="text-white me-2" target="_blank" rel="noopener noreferrer"><i class="fab fa-telegram"></i></a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <h5 class="mb-3">Контакты</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> {{ site_settings.address|default:"г. Москва, ул. Медицинская, 1" }}</li>
+                    <li class="mb-2"><i class="fas fa-phone me-2"></i> {{ site_settings.phone|default:"+7 (495) 123-45-67" }}</li>
+                    <li class="mb-2"><i class="fas fa-envelope me-2"></i> {{ site_settings.email|default:"info@meddiagnostika.ru" }}</li>
+                </ul>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <h5 class="mb-3">Режим работы</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2">{{ site_settings.working_hours|default:"Пн-Пт: 8:00 - 20:00" }}</li>
+                    <li class="mb-2">Сб: 9:00 - 18:00</li>
+                    <li class="mb-2">Вс: 9:00 - 15:00</li>
+                </ul>
+
+                <a href="{% url 'contacts:contact' %}" class="btn btn-outline-light mt-2">Связаться с нами</a>
+            </div>
+        </div>
+
+        <hr class="my-3 bg-light">
+
+        <div class="text-center">
+            <p class="mb-0">
+                &copy; {% now "Y" %} {{ site_settings.site_name|default:"МедДиагностика" }}. Все права защищены.
+            </p>
+        </div>
+    </div>
+</footer>
