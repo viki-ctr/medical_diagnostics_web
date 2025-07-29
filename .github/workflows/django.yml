@@ -1,10 +1,16 @@
-name: Django CI/CD Pipeline
+name: Django CI/CD Pipeline with Poetry
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+
+env:
+  POSTGRES_HOST: localhost
+  POSTGRES_DB: medical_db
+  POSTGRES_PORT: 5432
+  DEBUG: "False"
 
 jobs:
   test:
@@ -13,46 +19,128 @@ jobs:
       postgres:
         image: postgres:14
         env:
-          POSTGRES_DB: medical_db
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
         ports:
-          - 5432:5432
+          - ${{ env.POSTGRES_PORT }}:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 10
+        volumes:
+          - postgres_data:/var/lib/postgresql/data
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Check out code
+      uses: actions/checkout@v3
 
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.13'
+        cache: 'poetry'
 
-    - name: Install dependencies
-      run: |
-        pip install poetry psycopg2-binary
-        poetry config virtualenvs.create false
-        poetry install --no-interaction --no-ansi
+    - name: Install system dependencies
+      run: sudo apt-get install -y libpq-dev python3-dev
 
-    - name: Verify PostgreSQL connection
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        virtualenvs-create: false
+        installer-parallel: true
+
+    - name: Install Python dependencies
+      run: poetry install --no-interaction --no-ansi --with dev
+      env:
+        POETRY_CACHE_DIR: ~/.cache/poetry
+
+    - name: Wait for PostgreSQL
       run: |
-        PGPASSWORD=postgres psql -h localhost -U postgres -d medical_db -c "SELECT 1"
-        echo "Database connection successful!"
+        for i in {1..10}; do
+          if PGPASSWORD=postgres psql -h ${{ env.POSTGRES_HOST }} -U postgres -d ${{ env.POSTGRES_DB }} -c "SELECT 1"; then
+            echo "PostgreSQL is ready"
+            exit 0
+          fi
+          echo "Waiting for PostgreSQL..."
+          sleep 3
+        done
+        echo "Failed to connect to PostgreSQL"
+        exit 1
 
     - name: Run migrations
       run: poetry run python manage.py migrate
       env:
-        DATABASE_URL: postgres://postgres:postgres@localhost:5432/medical_db
+        DATABASE_URL: postgres://postgres:postgres@${{ env.POSTGRES_HOST }}:${{ env.POSTGRES_PORT }}/${{ env.POSTGRES_DB }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
-        DEBUG: "False"
 
-    - name: Run tests
-      run: poetry run python manage.py test
+    - name: Run tests with coverage
+      run: |
+        poetry run coverage run --source='.' manage.py test
+        poetry run coverage xml
       env:
-        DATABASE_URL: postgres://postgres:postgres@localhost:5432/medical_db
+        DATABASE_URL: postgres://postgres:postgres@${{ env.POSTGRES_HOST }}:${{ env.POSTGRES_PORT }}/${{ env.POSTGRES_DB }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
-        DEBUG: "False"
+
+    - name: Upload coverage
+      uses: codecov/codecov-action@v3
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.8.1
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Install rsync
+      run: sudo apt-get update && sudo apt-get install -y rsync
+
+    - name: Deploy to server
+      run: |
+        rsync -avz --delete \
+          --exclude={'__pycache__','.venv','.env','.git','.github'} \
+          --rsync-path="sudo rsync" \
+          . ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.DEPLOY_DIR }}
+
+    - name: Setup server environment
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          set -e
+          cd ${{ secrets.DEPLOY_DIR }}
+          
+          # Setup environment
+          [ ! -f .env ] && {
+            echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" > .env
+            echo "DEBUG=False" >> .env
+            echo "DATABASE_URL=postgres://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}" >> .env
+          }
+          
+          # Install Poetry
+          export PATH="$HOME/.local/bin:$PATH"
+          if ! command -v poetry &> /dev/null; then
+            curl -sSL https://install.python-poetry.org | python3 -
+            poetry config virtualenvs.in-project true
+          fi
+          
+          # Install dependencies
+          poetry install --no-interaction --no-ansi --only main
+          
+          # Run migrations
+          poetry run python manage.py migrate
+          poetry run python manage.py collectstatic --noinput
+          
+          # Restart services
+          sudo systemctl restart gunicorn.service
+          sudo systemctl restart nginx.service
+        EOF
+
+volumes:
+  postgres_data:
