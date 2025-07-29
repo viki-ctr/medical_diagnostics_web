@@ -30,7 +30,6 @@ class HomeView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['home_content'] = HomePageContent.objects.filter(is_active=True).first()
         context['testimonials'] = Testimonial.objects.filter(is_featured=True)[:5]
-        context['site_settings'] = SiteSetting.objects.first()
         return context
 
 
@@ -77,7 +76,9 @@ class TeamListView(ListView):
     model = TeamMember
     template_name = 'core/team_list.html'
     context_object_name = 'team_members'
-    queryset = TeamMember.objects.filter(is_visible=True).order_by('order')
+
+    def get_queryset(self):
+        return TeamMember.objects.filter(is_visible=True).order_by('order')
 
 
 class TestimonialListView(ListView):
@@ -166,9 +167,12 @@ class TeamMemberListAPIView(generics.ListAPIView):
     API для получения списка членов команды
     GET /api/team/
     """
-    queryset = TeamMember.objects.filter(is_visible=True).order_by('order')
     serializer_class = TeamMemberSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.AllowAny]
+    queryset = TeamMember.objects.filter(is_visible=True).order_by('order')
+
+    def get_serializer_context(self):
+        return {'request': self.request}
 
 
 class TestimonialListAPIView(generics.ListAPIView):

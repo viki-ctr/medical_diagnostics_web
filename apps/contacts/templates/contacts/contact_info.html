@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="container py-5">
+    <h1 class="mb-4">Контактная информация</h1>
+    
+    <div class="row">
+        <div class="col-md-6">
+            {% include 'contacts/includes/_contact_card.html' %}
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h3>Напишите нам</h3>
+                    {% include 'contacts/feedback_form.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

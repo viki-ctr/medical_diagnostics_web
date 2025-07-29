@@ -3,5 +3,5 @@ from .models import SiteSetting
 
 def site_settings(request):
     return {
-        'SiteSetting': SiteSetting
+        'site_settings': SiteSetting.objects.first()
     }

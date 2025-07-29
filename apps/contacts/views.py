@@ -1,10 +1,45 @@
+from django.shortcuts import redirect, render
+from django.views.generic import TemplateView, ListView
 from rest_framework import generics, permissions, viewsets
+
+from .forms import FeedbackForm
 from .models import ContactInfo, Feedback, Branch
 from .serializers import (
     ContactInfoSerializer,
     FeedbackSerializer,
     BranchSerializer
 )
+
+
+class ContactInfoView(TemplateView):
+    template_name = 'contacts/contact_info.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['contact_info'] = ContactInfo.objects.first()
+        return context
+
+
+class BranchesListView(ListView):
+    model = Branch
+    template_name = 'contacts/branches_list.html'
+    context_object_name = 'branches'
+
+
+def feedback_view(request):
+    if request.method == 'POST':
+        form = FeedbackForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('contacts:feedback_thanks')
+    else:
+        form = FeedbackForm()
+
+    return render(request, 'contacts/feedback_form.html', {'form': form})
+
+
+class FeedbackThanksView(TemplateView):
+    template_name = 'contacts/feedback_thanks.html'
 
 
 class ContactInfoAPIView(generics.RetrieveAPIView):
@@ -30,7 +65,7 @@ class FeedbackViewSet(viewsets.ModelViewSet):
     serializer_class = FeedbackSerializer
 
     def get_permissions(self):
-        if self.request.method == 'POST':
+        if self.request.method in ['GET', 'POST']:
             return [permissions.AllowAny()]
         return [permissions.IsAdminUser()]
 

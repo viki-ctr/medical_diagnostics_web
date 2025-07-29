@@ -1,6 +1,10 @@
 from rest_framework import generics, permissions, status, mixins, viewsets
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
+from django.views.generic import TemplateView
+from django.contrib.auth.views import LogoutView as DjangoLogoutView
 from django.contrib.auth import get_user_model
 from .serializers import (
     UserSerializer,
@@ -129,3 +133,42 @@ class DoctorProfileViewSet(
         if self.request.method == 'PUT':
             return [permissions.IsAuthenticated(), permissions.IsAdminUser()]
         return [permissions.IsAuthenticated()]
+
+
+class LogoutAPIView(APIView):
+    def post(self, request):
+        try:
+            refresh_token = request.data.get('refresh_token')
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response(status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class LoginView(TemplateView):
+    template_name = 'users/login.html'
+
+
+class RegisterView(TemplateView):
+    template_name = 'users/register.html'
+
+
+class ProfileView(TemplateView):
+    template_name = 'users/profile.html'
+
+
+class ChangePasswordView(TemplateView):
+    template_name = 'users/change_password.html'
+
+
+class LogoutView(DjangoLogoutView):
+    next_page = 'home'
+
+
+class PatientProfileView(TemplateView):
+    template_name = 'users/patient_profile.html'
+
+
+class DoctorProfileView(TemplateView):
+    template_name = 'users/doctor_profile.html'

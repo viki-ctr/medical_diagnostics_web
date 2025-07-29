@@ -12,6 +12,7 @@ from .models import (
 
 class TeamMemberSerializer(serializers.ModelSerializer):
     photo_url = serializers.SerializerMethodField()
+    department = serializers.StringRelatedField()
 
     class Meta:
         model = TeamMember
@@ -23,12 +24,15 @@ class TeamMemberSerializer(serializers.ModelSerializer):
             'bio',
             'education',
             'experience',
-            'order'
+            'specialization',
+            'department'
         ]
+        read_only_fields = fields
 
     def get_photo_url(self, obj):
-        if obj.photo:
-            return obj.photo.url
+        request = self.context.get('request')
+        if obj.photo_url and request:
+            return request.build_absolute_uri(obj.photo_url)
         return None
 
 

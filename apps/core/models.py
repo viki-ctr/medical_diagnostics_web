@@ -1,5 +1,9 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth import get_user_model
+
+
+User = get_user_model()
 
 
 class AboutPage(models.Model):
@@ -31,14 +35,12 @@ class AboutPage(models.Model):
 
 
 class TeamMember(models.Model):
-    """
-    Модель члена команды для страницы 'О клинике'
-    """
-    about_page = models.ForeignKey(
-        AboutPage,
+    user = models.OneToOneField(
+        User,
         on_delete=models.CASCADE,
-        related_name='team_members',
-        verbose_name=_('Страница "О клинике"')
+        null=True,
+        blank=True,
+        related_name='team_member'
     )
     name = models.CharField(_('Имя'), max_length=100)
     position = models.CharField(_('Должность'), max_length=100)
@@ -48,9 +50,24 @@ class TeamMember(models.Model):
         null=True,
         blank=True
     )
-    bio = models.TextField(_('Биография'))
+    bio = models.TextField(_('Биография'), blank=True)
     education = models.TextField(_('Образование'), blank=True)
     experience = models.TextField(_('Опыт работы'), blank=True)
+    specialization = models.CharField(_('Специализация'), max_length=200, blank=True)
+    department = models.ForeignKey(
+        'Department',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name=_('Отдел')
+    )
+    about_page = models.ForeignKey(
+        'AboutPage',
+        on_delete=models.CASCADE,
+        related_name='team_members',
+        null=True,
+        blank=True
+    )
     order = models.PositiveIntegerField(_('Порядок отображения'), default=0)
     is_visible = models.BooleanField(_('Отображать на сайте'), default=True)
 
@@ -61,6 +78,24 @@ class TeamMember(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.position}"
+
+
+class Department(models.Model):
+    name = models.CharField(_('Название отдела'), max_length=100)
+    featured_image = models.ImageField(
+        _('Фоновое изображение'),
+        upload_to='department_images/',
+        null=True,
+        blank=True
+    )
+    description = models.TextField(_('Описание'), blank=True)
+
+    class Meta:
+        verbose_name = _('Отдел')
+        verbose_name_plural = _('Отделы')
+
+    def __str__(self):
+        return self.name
 
 
 class HomePageContent(models.Model):

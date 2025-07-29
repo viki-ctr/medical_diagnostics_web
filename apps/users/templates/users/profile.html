@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <img src="{% static 'images/default-avatar.png' %}" class="rounded-circle mb-3" width="150" alt="Аватар">
+                    <h5>{{ user.username }}</h5>
+                    <p class="text-muted">{{ user.email }}</p>
+                    
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a href="{% url 'users:change_password' %}" class="text-decoration-none">
+                                <i class="fas fa-key me-1"></i> Сменить пароль
+                            </a>
+                        </li>
+                        {% if user.patient_profile %}
+                        <li class="mb-2">
+                            <a href="{% url 'users:patient_profile' user.patient_profile.id %}" class="text-decoration-none">
+                                <i class="fas fa-user-injured me-1"></i> Профиль пациента
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% if user.doctor_profile %}
+                        <li>
+                            <a href="{% url 'users:doctor_profile' user.doctor_profile.id %}" class="text-decoration-none">
+                                <i class="fas fa-user-md me-1"></i> Профиль врача
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Мои данные</h5>
+                </div>
+                <div class="card-body">
+                    <form id="profileForm">
+                        {% csrf_token %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    const token = localStorage.getItem('access_token');
+    
+    try {
+        const response = await fetch('/api/users/me/', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const userData = await response.json();
+            renderProfileForm(userData);
+        } else {
+            window.location.href = "{% url 'users:login' %}";
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+});
+
+function renderProfileForm(userData) {
+    const form = document.getElementById('profileForm');
+}
+</script>
+{% endblock %}

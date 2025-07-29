@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="container py-5">
+    <h1 class="mb-4">Наши филиалы</h1>
+    
+    <div class="row g-4">
+        {% for branch in branches %}
+            {% include 'contacts/includes/_branch_card.html' %}
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

@@ -1,62 +1,137 @@
-<header class="bg-primary text-white">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'core:home' %}">
-                <i class="fas fa-hospital me-2"></i>
-                {% with settings=SiteSetting.objects.first %}
-                    {{ settings.site_name|default:"МедДиагностика" }}
-                {% endwith %}
-            </a>
+{% load static %}
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="mainNavbar">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'core:home' %}">Главная</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'core:about' %}">О клинике</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'services:list' %}">Услуги</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'core:faq_list' %}">Вопросы</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'contacts:contact' %}">Контакты</a>
-                    </li>
-                </ul>
-
-                <ul class="navbar-nav">
+<header class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'core:home' %}">
+            {% if site_settings.logo %}
+            <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_name }}" height="40">
+            {% else %}
+            {{ site_settings.site_name|default:"МедДиагностика" }}
+            {% endif %}
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'core:home' %}">Главная</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'core:about' %}">О клинике</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'core:team_list' %}">Врачи</a>
+                </li>
+            </ul>
+            
+            <div class="d-flex align-items-center">
+                <!-- Поиск (если нужен) -->
+                <form class="d-flex me-3">
+                    <input class="form-control me-2" type="search" placeholder="Поиск" aria-label="Search">
+                    <button class="btn btn-outline-light" type="submit">Найти</button>
+                </form>
+                
+                <!-- Блок авторизации -->
+                <div id="authBlock" class="d-flex">
                     {% if user.is_authenticated %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-circle me-1"></i>
-                            {{ user.get_short_name|default:user.username }}
+                    <div class="dropdown">
+                        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" 
+                           id="userDropdown" data-bs-toggle="dropdown">
+                            {% if user.patient_profile.photo %}
+                            <img src="{{ user.patient_profile.photo.url }}" width="32" height="32" 
+                                 class="rounded-circle me-2">
+                            {% elif user.doctor_profile.photo %}
+                            <img src="{{ user.doctor_profile.photo.url }}" width="32" height="32" 
+                                 class="rounded-circle me-2">
+                            {% else %}
+                            <i class="fas fa-user-circle fa-lg me-1"></i>
+                            {% endif %}
+                            <span>{{ user.username }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">Профиль</a></li>
-                            {% if user.is_patient %}
-                            <li><a class="dropdown-item" href="{% url 'appointments:list' %}">Мои записи</a></li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'users:profile' %}">
+                                    <i class="fas fa-user me-1"></i> Профиль
+                                </a>
+                            </li>
+                            {% if user.is_staff %}
+                            <li>
+                                <a class="dropdown-item" href="{% url 'admin:index' %}">
+                                    <i class="fas fa-cog me-1"></i> Админка
+                                </a>
+                            </li>
                             {% endif %}
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Выйти</a></li>
+                            <li>
+                                <a class="dropdown-item" href="#" id="logoutBtn">
+                                    <i class="fas fa-sign-out-alt me-1"></i> Выйти
+                                </a>
+                            </li>
                         </ul>
-                    </li>
+                    </div>
                     {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'accounts:login' %}">Вход</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'accounts:register' %}">Регистрация</a>
-                    </li>
+                    <div class="btn-group">
+                        <a href="{% url 'users:login' %}" class="btn btn-outline-light me-2">Войти</a>
+                        <a href="{% url 'users:register' %}" class="btn btn-light">Регистрация</a>
+                    </div>
                     {% endif %}
-                </ul>
+                </div>
             </div>
         </div>
-    </nav>
+    </div>
 </header>
+
+<script>
+// Обработка выхода
+document.getElementById('logoutBtn')?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    
+    try {
+        const response = await fetch('/api/users/logout/', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            window.location.href = "{% url 'home' %}";
+        }
+    } catch (error) {
+        console.error('Logout error:', error);
+    }
+});
+
+// Проверка аутентификации при загрузке страницы
+document.addEventListener('DOMContentLoaded', async () => {
+    const token = localStorage.getItem('access_token');
+    const authBlock = document.getElementById('authBlock');
+    
+    if (token && !authBlock.querySelector('.dropdown')) {
+        try {
+            const response = await fetch('/api/users/me/', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error('Auth check error:', error);
+        }
+    }
+});
+</script>

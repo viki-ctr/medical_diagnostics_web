@@ -20,9 +20,12 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from apps.core.views import HomeView, AboutView
+
 urlpatterns = [
+    path('', HomeView.as_view(), name='home'),
     path("admin/", admin.site.urls),
-    path('', include(('apps.core.urls', 'core'), namespace='core_web')),
+    path('', include(('apps.core.urls', 'core'), namespace='core')),
     path('api/core/', include(('apps.core.urls', 'core'), namespace='core_api')),
     path('services/', include('apps.services.urls')),
     path('contacts/', include('apps.contacts.urls')),

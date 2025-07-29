@@ -1,29 +1,27 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
-from .views import (
-    UserViewSet,
-    PatientProfileViewSet,
-    DoctorProfileViewSet,
-    CurrentUserAPIView,
-    RegisterAPIView,
-    ChangePasswordAPIView,
-    CustomTokenObtainPairView
-)
+from django.urls import path
+from rest_framework_simplejwt.views import TokenRefreshView
+from . import views
 
-router = DefaultRouter()
-router.register(r'patients', PatientProfileViewSet, basename='patient')
-router.register(r'doctors', DoctorProfileViewSet, basename='doctor')
+
+app_name = 'users'
+
 
 urlpatterns = [
-    path('api/', include(router.urls)),
-    path('register/', RegisterAPIView.as_view(), name='register'),
-    path('login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('me/', CurrentUserAPIView.as_view(), name='current-user'),
-    path('change-password/', ChangePasswordAPIView.as_view(), name='change-password'),
-    path('users/', UserViewSet.as_view(), name='user-list'),
-] + router.urls
+    path('api/login/', views.CustomTokenObtainPairView.as_view(), name='api_login'),
+    path('api/login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/register/', views.RegisterAPIView.as_view(), name='api_register'),
+    path('api/me/', views.CurrentUserAPIView.as_view(), name='api_current_user'),
+    path('api/change-password/', views.ChangePasswordAPIView.as_view(), name='api_change_password'),
+    path('api/logout/', views.LogoutAPIView.as_view(), name='api_logout'),
+
+
+    path('login/', views.LoginView.as_view(), name='login'),
+    path('register/', views.RegisterView.as_view(), name='register'),
+    path('profile/', views.ProfileView.as_view(), name='profile'),
+    path('profile/change-password/', views.ChangePasswordView.as_view(), name='change_password'),
+    path('logout/', views.LogoutView.as_view(), name='logout'),
+
+
+    path('patients/<int:pk>/', views.PatientProfileView.as_view(), name='patient_profile'),
+    path('doctors/<int:pk>/', views.DoctorProfileView.as_view(), name='doctor_profile'),
+]
