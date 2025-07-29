@@ -40,7 +40,7 @@ jobs:
         poetry install --no-interaction --no-ansi
 
     - name: Wait for PostgreSQL
-      run: sleep 5
+      run: sleep 10
 
     - name: Check PostgreSQL connection
       run: |
