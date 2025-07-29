@@ -59,6 +59,8 @@ jobs:
         POSTGRES_DB: medical_db
         POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
         POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        DEBUG: "False"
 
   deploy:
     runs-on: ubuntu-latest
@@ -91,6 +93,14 @@ jobs:
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           set -e
           cd ${{ secrets.DEPLOY_DIR }}
+          if [ ! -f .env ]; then
+            echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" > .env
+            echo "DEBUG=False" >> .env
+            echo "POSTGRES_HOST=localhost" >> .env
+            echo "POSTGRES_DB=medical_db" >> .env
+            echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+            echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+          fi
           
           # Install Poetry if not exists
           if ! command -v poetry &> /dev/null; then
