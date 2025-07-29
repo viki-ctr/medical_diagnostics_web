@@ -48,7 +48,7 @@ jobs:
         POSTGRES_DB: medical_db
         POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
         POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-        POSTGRES_HOST: localhost
+        POSTGRES_HOST: postgres
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
         DEBUG: "True"
 
