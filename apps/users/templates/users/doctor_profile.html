@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <img src="{{ doctor.image.url }}" class="card-img-top" alt="Фото врача">
+                <div class="card-body">
+                    <h5 class="card-title">Доктор {{ doctor.user.get_full_name }}</h5>
+                    <p class="card-text">{{ doctor.specialization }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <h3>Расписание</h3>
+        </div>
+    </div>
+</div>
+{% endblock %}

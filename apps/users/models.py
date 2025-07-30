@@ -8,9 +8,9 @@ class User(AbstractUser):
     phone = models.CharField(max_length=20, blank=True)
 
     class Meta:
-        verbose_name = 'User'
-        verbose_name_plural = 'Users'
-        swappable = 'AUTH_USER_MODEL'
+        verbose_name = "User"
+        verbose_name_plural = "Users"
+        swappable = "AUTH_USER_MODEL"
 
 
 class PatientProfile(models.Model):

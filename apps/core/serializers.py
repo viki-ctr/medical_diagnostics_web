@@ -1,13 +1,6 @@
 from rest_framework import serializers
-from .models import (
-    AboutPage,
-    TeamMember,
-    HomePageContent,
-    Testimonial,
-    FAQ,
-    FAQCategory,
-    SiteSetting
-)
+
+from .models import FAQ, AboutPage, FAQCategory, HomePageContent, SiteSetting, TeamMember, Testimonial
 
 
 class TeamMemberSerializer(serializers.ModelSerializer):
@@ -17,20 +10,20 @@ class TeamMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = TeamMember
         fields = [
-            'id',
-            'name',
-            'position',
-            'photo_url',
-            'bio',
-            'education',
-            'experience',
-            'specialization',
-            'department'
+            "id",
+            "name",
+            "position",
+            "photo_url",
+            "bio",
+            "education",
+            "experience",
+            "specialization",
+            "department",
         ]
         read_only_fields = fields
 
     def get_photo_url(self, obj):
-        request = self.context.get('request')
+        request = self.context.get("request")
         if obj.photo_url and request:
             return request.build_absolute_uri(obj.photo_url)
         return None
@@ -41,15 +34,7 @@ class AboutPageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AboutPage
-        fields = [
-            'id',
-            'title',
-            'content',
-            'mission',
-            'values',
-            'team_members',
-            'updated_at'
-        ]
+        fields = ["id", "title", "content", "mission", "values", "team_members", "updated_at"]
 
 
 class HomePageContentSerializer(serializers.ModelSerializer):
@@ -58,14 +43,14 @@ class HomePageContentSerializer(serializers.ModelSerializer):
     class Meta:
         model = HomePageContent
         fields = [
-            'id',
-            'main_title',
-            'main_description',
-            'services_title',
-            'testimonials_title',
-            'featured_image_url',
-            'is_active',
-            'updated_at'
+            "id",
+            "main_title",
+            "main_description",
+            "services_title",
+            "testimonials_title",
+            "featured_image_url",
+            "is_active",
+            "updated_at",
         ]
 
     def get_featured_image_url(self, obj):
@@ -81,15 +66,15 @@ class TestimonialSerializer(serializers.ModelSerializer):
     class Meta:
         model = Testimonial
         fields = [
-            'id',
-            'author',
-            'position',
-            'content',
-            'photo_url',
-            'author_initials',
-            'rating',
-            'is_featured',
-            'created_at'
+            "id",
+            "author",
+            "position",
+            "content",
+            "photo_url",
+            "author_initials",
+            "rating",
+            "is_featured",
+            "created_at",
         ]
 
     def get_photo_url(self, obj):
@@ -107,14 +92,7 @@ class TestimonialSerializer(serializers.ModelSerializer):
 class FAQSerializer(serializers.ModelSerializer):
     class Meta:
         model = FAQ
-        fields = [
-            'id',
-            'question',
-            'answer',
-            'category',
-            'order',
-            'is_active'
-        ]
+        fields = ["id", "question", "answer", "category", "order", "is_active"]
 
 
 class FAQCategorySerializer(serializers.ModelSerializer):
@@ -122,14 +100,7 @@ class FAQCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FAQCategory
-        fields = [
-            'id',
-            'name',
-            'slug',
-            'description',
-            'order',
-            'faqs'
-        ]
+        fields = ["id", "name", "slug", "description", "order", "faqs"]
 
 
 class SiteSettingSerializer(serializers.ModelSerializer):
@@ -139,18 +110,18 @@ class SiteSettingSerializer(serializers.ModelSerializer):
     class Meta:
         model = SiteSetting
         fields = [
-            'site_name',
-            'logo_url',
-            'favicon_url',
-            'phone',
-            'email',
-            'address',
-            'working_hours',
-            'facebook_url',
-            'instagram_url',
-            'telegram_url',
-            'meta_description',
-            'meta_keywords'
+            "site_name",
+            "logo_url",
+            "favicon_url",
+            "phone",
+            "email",
+            "address",
+            "working_hours",
+            "facebook_url",
+            "instagram_url",
+            "telegram_url",
+            "meta_description",
+            "meta_keywords",
         ]
 
     def get_logo_url(self, obj):

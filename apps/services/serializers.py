@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from .models import Service, ServiceCategory
 
 
@@ -7,29 +8,21 @@ class ServiceCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ServiceCategory
-        fields = [
-            'id',
-            'name',
-            'slug',
-            'description',
-            'services_count'
-        ]
+        fields = ["id", "name", "slug", "description", "services_count"]
 
     def get_service_count(self, obj):
         return obj.service_set.count()
 
 
 class ServiceSerializer(serializers.ModelSerializer):
-    category_name = serializers.CharField(source='category.name', read_only=True)
+    category_name = serializers.CharField(source="category.name", read_only=True)
     image_url = serializers.SerializerMethodField()
     duration_formatted = serializers.SerializerMethodField()
 
     class Meta:
         model = Service
-        fields = ['id', 'name', 'price', 'duration', 'category']
-        extra_kwargs = {
-            'slug': {'read_only': True}
-        }
+        fields = ["id", "name", "price", "duration", "category"]
+        extra_kwargs = {"slug": {"read_only": True}}
 
     def get_image_url(self, obj):
         if obj.image:
