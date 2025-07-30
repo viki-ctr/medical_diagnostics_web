@@ -1,18 +1,24 @@
 from django.contrib import admin
+from django.db.models import Count
 
 from .models import Service, ServiceCategory
 
 
 @admin.register(ServiceCategory)
 class ServiceCategoryAdmin(admin.ModelAdmin):
-    list_display = ("name", "get_service_count")
+    list_display = ("name", "service_count")
     search_fields = ("name", "description")
     prepopulated_fields = {"slug": ("name",)}
 
-    def get_service_count(self, obj):
-        return obj.service_set.count()
+    def get_queryset(self, request):
+        return super().get_queryset(request).annotate(
+            service_count=Count('services')
+        )
 
-    get_service_count.short_description = "Services count"
+    def service_count(self, obj):
+        return obj.service_count
+
+    service_count.admin_order_field = 'service_count'
 
 
 @admin.register(Service)
@@ -25,8 +31,8 @@ class ServiceAdmin(admin.ModelAdmin):
     filter_horizontal = ()
     fieldsets = (
         (None, {"fields": ("category", "name", "slug", "is_available")}),
-        ("Details", {"fields": ("description", "preparation", "price", "duration")}),
-        ("Additional", {"fields": ("image",), "classes": ("collapse",)}),
+        ("Детали", {"fields": ("description", "preparation", "price", "duration")}),
+        ("Дополнительно", {"fields": ("image",), "classes": ("collapse",)}),
     )
 
     class Media:

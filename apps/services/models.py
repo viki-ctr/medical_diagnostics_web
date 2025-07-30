@@ -23,6 +23,11 @@ class Service(models.Model):
     duration = models.DurationField()
     image = models.ImageField(upload_to="services/", null=True, blank=True)
     is_available = models.BooleanField(default=True)
+    preparation = models.TextField(
+        "Подготовка к услуге",
+        blank=True,
+        help_text="Инструкции для пациента перед процедурой"
+    )
 
     class Meta:
         verbose_name = "Услуга"
