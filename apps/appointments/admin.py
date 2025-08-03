@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
 
+from ..users.models import DoctorProfile
 from .models import Appointment, DoctorSchedule
 
 
@@ -12,11 +13,18 @@ class AppointmentAdmin(admin.ModelAdmin):
         "patient_info",
         "doctor_info",
         "service_info",
-        "appointment_date",
+        "appointment_date_formatted",
         "status",
+        "results_link",
         "custom_actions",
     )
-    list_filter = ("status", "appointment_date", "doctor", "service")
+    list_filter = (
+        "status",
+        "appointment_date",
+        "doctor",
+        "service",
+        ("appointment_date", admin.DateFieldListFilter),
+    )
     search_fields = ("patient__username", "patient__email", "doctor__user__username", "service__name")
     list_select_related = ("patient", "doctor", "service")
     date_hierarchy = "appointment_date"
@@ -66,6 +74,21 @@ class AppointmentAdmin(admin.ModelAdmin):
 
     custom_actions.short_description = "Actions"
 
+    def appointment_date_formatted(self, obj):
+        from django.utils.formats import localize
+
+        return localize(obj.appointment_date.astimezone())
+
+    appointment_date_formatted.short_description = "Дата и время"
+    appointment_date_formatted.admin_order_field = "appointment_date"
+
+    def results_link(self, obj):
+        if obj.results:
+            return format_html('<a href="{}" target="_blank">Скачать</a>', obj.results.url)
+        return "-"
+
+    results_link.short_description = "Результаты"
+
     @admin.action(description="Mark selected as confirmed")
     def mark_as_confirmed(self, request, queryset):
         queryset.update(status="confirmed")
@@ -81,10 +104,35 @@ class AppointmentAdmin(admin.ModelAdmin):
 
 @admin.register(DoctorSchedule)
 class DoctorScheduleAdmin(admin.ModelAdmin):
-    list_display = ("doctor", "formatted_working_days")
+    list_display = (
+        "doctor",
+        "formatted_working_days",
+        "working_hours_display",
+    )
 
     def formatted_working_days(self, obj):
         days = {0: "Пн", 1: "Вт", 2: "Ср", 3: "Чт", 4: "Пт", 5: "Сб", 6: "Вс"}
         return ", ".join(days[day] for day in obj.working_days)
 
     formatted_working_days.short_description = "Рабочие дни"
+
+    def working_hours_display(self, obj):
+        return f"{obj.working_hours['start']} - {obj.working_hours['end']}"
+
+    working_hours_display.short_description = "Рабочие часы"
+
+
+class SpecialtyFilter(admin.SimpleListFilter):
+    title = "Специализация"
+    parameter_name = "specialty"
+
+    def lookups(self, request, model_admin):
+        return DoctorProfile.SPECIALTY_CHOICES
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(doctor__specialty=self.value())
+        return queryset
+
+
+list_filter = (SpecialtyFilter,)

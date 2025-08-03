@@ -8,6 +8,11 @@ class ContactInfo(models.Model):
     working_hours = models.CharField(max_length=100)
     map_embed_code = models.TextField(blank=True)
 
+    def get_working_hours_list(self):
+        if self.working_hours:
+            return str(self.working_hours).split(";")
+        return []
+
 
 class Feedback(models.Model):
     name = models.CharField(max_length=100)
@@ -17,6 +22,11 @@ class Feedback(models.Model):
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     is_processed = models.BooleanField(default=False)
+
+    def get_short_message(self):
+        return self.message[:50] + "..." if len(self.message) > 50 else self.message
+
+    get_short_message.short_description = "Сообщение"
 
 
 class Branch(models.Model):
@@ -37,3 +47,6 @@ class Branch(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_map_iframe(self):
+        return self.map_embed_code.replace('width="600"', 'width="100%"')

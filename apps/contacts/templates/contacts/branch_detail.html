@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'contacts:contact-info' %}">Контакты</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'contacts:branches-list' %}">Филиалы</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ branch.name }}</li>
+        </ol>
+    </nav>
+    
+    <div class="row">
+        <div class="col-md-6">
+            {% if branch.photo %}
+            <img src="{{ branch.photo.url }}" class="img-fluid rounded mb-4" alt="{{ branch.name }}">
+            {% endif %}
+            
+            <h2>{{ branch.name }}</h2>
+            <p><i class="bi bi-geo-alt-fill"></i> <strong>Адрес:</strong> {{ branch.address }}</p>
+            <p><i class="bi bi-telephone-fill"></i> <strong>Телефон:</strong> {{ branch.phone }}</p>
+            <p><i class="bi bi-envelope-fill"></i> <strong>Email:</strong> {{ branch.email }}</p>
+            
+            <h5 class="mt-4">Режим работы:</h5>
+            <ul>
+                {% for hours in branch.get_working_hours_list %}
+                    <li>{{ hours }}</li>
+                {% empty %}
+                    <li>Режим работы не указан</li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <div class="col-md-6">
+            {% if branch.map_embed_code %}
+                <div class="map-container">
+                    {{ branch.map_embed_code|safe }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

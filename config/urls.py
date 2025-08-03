@@ -25,8 +25,7 @@ from apps.core.views import HomeView
 urlpatterns = [
     path("", HomeView.as_view(), name="home"),
     path("admin/", admin.site.urls),
-    path("", include(("apps.core.urls", "core"), namespace="core")),
-    path("api/core/", include(("apps.core.urls", "core"), namespace="core_api")),
+    path("", include("apps.core.urls")),
     path("services/", include("apps.services.urls")),
     path("contacts/", include("apps.contacts.urls")),
     path("appointments/", include("apps.appointments.urls")),

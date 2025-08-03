@@ -2,16 +2,21 @@ from django.db import models
 
 
 class ServiceCategory(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
-    description = models.TextField(blank=True)
+    description = models.TextField()
+    icon = models.CharField(
+        max_length=50,
+        default="fa-flask",
+        blank=True,  # Разрешаем пустое значение
+        null=True,  # Разрешаем NULL в базе
+        help_text="Font Awesome icon class (например, 'fa-heart')",
+    )
+    is_main = models.BooleanField(default=False)
 
     class Meta:
-        verbose_name = "Категория услуг"
-        verbose_name_plural = "Категории услуг"
-
-    def __str__(self):
-        return self.name
+        verbose_name = "Категория исследований"
+        verbose_name_plural = "Категории исследований"
 
 
 class Service(models.Model):
@@ -24,9 +29,7 @@ class Service(models.Model):
     image = models.ImageField(upload_to="services/", null=True, blank=True)
     is_available = models.BooleanField(default=True)
     preparation = models.TextField(
-        "Подготовка к услуге",
-        blank=True,
-        help_text="Инструкции для пациента перед процедурой"
+        "Подготовка к услуге", blank=True, help_text="Инструкции для пациента перед процедурой"
     )
 
     class Meta:

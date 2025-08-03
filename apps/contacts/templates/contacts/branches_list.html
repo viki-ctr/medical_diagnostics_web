@@ -1,13 +1,33 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<section class="container py-5">
+<div class="container mt-5">
     <h1 class="mb-4">Наши филиалы</h1>
-    
-    <div class="row g-4">
+
+    <div class="row row-cols-1 row-cols-md-2 g-4">
         {% for branch in branches %}
-            {% include 'contacts/includes/_branch_card.html' %}
+        <div class="col">
+            <div class="card h-100">
+                {% if branch.photo %}
+                <img src="{{ branch.photo.url }}" class="card-img-top" alt="{{ branch.name }}">
+                {% endif %}
+
+                <div class="card-body">
+                    <h5 class="card-title">{{ branch.name }}</h5>
+                    <p class="card-text">
+                        <i class="bi bi-geo-alt"></i> {{ branch.address }}<br>
+                        <i class="bi bi-telephone"></i> {{ branch.phone }}
+                    </p>
+                </div>
+
+                <div class="card-footer bg-transparent">
+                    <a href="{% url 'contacts:branch-detail' branch.id %}" class="btn btn-sm btn-primary">
+                        Подробнее
+                    </a>
+                </div>
+            </div>
+        </div>
         {% endfor %}
     </div>
-</section>
+</div>
 {% endblock %}

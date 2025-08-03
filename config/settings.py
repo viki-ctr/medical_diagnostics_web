@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "django_celery_beat",
     "crispy_forms",
     "crispy_bootstrap5",
+    'widget_tweaks',
     "apps.users",
     "apps.core",
     "apps.services",

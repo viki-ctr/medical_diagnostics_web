@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="hero-banner bg-light py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">Современная диагностика<br>для вашего здоровья</h1>
+                <p class="lead mb-4">Точные результаты с использованием оборудования экспертного класса</p>
+                <div class="d-flex gap-3">
+                    <a href="{% url 'services:list' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-search me-2"></i>Все исследования
+                    </a>
+                    <a href="{% url 'appointments:create' %}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-calendar-alt me-2"></i>Записаться онлайн
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <img src="/static/images/medical-banner.jpg" class="img-fluid rounded" alt="Медицинская диагностика">
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Основные направления диагностики</h2>
+        <div class="row g-4">
+            {% for category in main_categories %}
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-circle bg-primary text-white mb-3 mx-auto">
+                            <i class="fas {{ category.icon }} fa-2x"></i>
+                        </div>
+                        <h3 class="h4">{{ category.name }}</h3>
+                        <p class="text-muted">{{ category.description|truncatechars:100 }}</p>
+                        <a href="{% url 'services:category' category.slug %}" class="btn btn-outline-primary mt-2">
+                            Смотреть исследования
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Популярные исследования</h2>
+            <a href="{% url 'services:list' %}" class="btn btn-outline-primary">
+                Все исследования <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            {% for service in popular_services %}
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    {% if service.image %}
+                    <img src="{{ service.image.url }}" class="card-img-top" alt="{{ service.name }}" style="height: 180px; object-fit: cover;">
+                    {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                        <i class="fas fa-flask fa-3x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ service.name }}</h5>
+                        <span class="badge bg-primary mb-2">{{ service.category.name }}</span>
+                        <p class="card-text text-muted small">{{ service.short_description|truncatechars:80 }}</p>
+                    </div>
+                    <div class="card-footer bg-white border-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-primary fw-bold">{{ service.price }} ₽</span>
+                            <a href="{% url 'services:detail' service.slug %}" class="btn btn-sm btn-outline-primary">
+                                Подробнее
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">Популярные исследования появятся здесь скоро</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 order-lg-2">
+                <img src="/static/images/about-clinic.jpg" class="img-fluid rounded shadow" alt="О диагностическом центре">
+            </div>
+            <div class="col-lg-6 order-lg-1">
+                <h2 class="mb-4">О нашем диагностическом центре</h2>
+                <p class="lead">Мы предлагаем полный спектр современных диагностических исследований с использованием оборудования экспертного класса.</p>
+                <ul class="list-unstyled mb-4">
+                    <li class="mb-2"><i class="fas fa-check-circle text-primary me-2"></i> Высокоточная диагностика</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-primary me-2"></i> Опытные специалисты</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-primary me-2"></i> Комфортные условия</li>
+                    <li><i class="fas fa-check-circle text-primary me-2"></i> Быстрые результаты</li>
+                </ul>
+                <div class="d-flex gap-3">
+                    <a href="{% url 'core:about' %}" class="btn btn-primary px-4">Подробнее о центре</a>
+                    <a href="{% url 'contacts:contact-info' %}" class="btn btn-outline-primary px-4">Наши контакты</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

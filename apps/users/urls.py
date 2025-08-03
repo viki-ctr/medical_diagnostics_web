@@ -1,33 +1,23 @@
-from django.urls import include, path
-from rest_framework.routers import DefaultRouter
+from django.contrib.auth import views as auth_views
+from django.urls import path
 
 from . import views
-from .views import (ChangePasswordAPIView, CurrentUserAPIView, CustomTokenObtainPairView,
-                    DoctorProfileViewSet, LoginView, LogoutAPIView, LogoutView,
-                    PatientProfileViewSet, ProfileView, RegisterAPIView, RegisterView)
 
 app_name = "users"
 
-router = DefaultRouter()
-router.register(r"patients", PatientProfileViewSet, basename="patient")
-router.register(r"doctors", DoctorProfileViewSet, basename="doctor")
 
 urlpatterns = [
-
-    path("api/register/", RegisterAPIView.as_view(), name="register"),
-    path("api/login/", CustomTokenObtainPairView.as_view(), name="login"),
-    path("api/me/", CurrentUserAPIView.as_view(), name="current-user"),
-    path("api/change-password/", ChangePasswordAPIView.as_view(), name="change-password"),
-    path("api/logout/", LogoutAPIView.as_view(), name="logout"),
-    path("api/", include(router.urls)),
-
-    path("login/", LoginView.as_view(), name="login-view"),
-    path("register/", RegisterView.as_view(), name="register-view"),
+    path("register/", views.RegisterView.as_view(), name="register"),
+    path("login/", views.LoginView.as_view(), name="login"),
+    path("logout/", views.LogoutView.as_view(), name="logout"),
     path("profile/", views.ProfileView.as_view(), name="profile"),
-    path("change-password/", views.ChangePasswordView.as_view(), name="change-password-view"),
-    path("logout/", LogoutView.as_view(), name="logout-view"),
-    path("patients/<int:pk>/", views.PatientProfileView.as_view(), name="patient-profile-view"),
-    path("doctors/<int:pk>/", views.DoctorProfileView.as_view(), name="doctor-profile-view"),
-
-    path("", ProfileView.as_view(), name="user-home"),
+    path("password/change-password/", views.ChangePasswordView.as_view(), name="change-password"),
+    path(
+        "password/change-done/",
+        auth_views.PasswordChangeDoneView.as_view(template_name="users/change_password_done.html"),
+        name="change-password-done",
+    ),
+    path("profile/patient_profile/", views.PatientProfileView.as_view(), name="patient-profile"),
+    path("profile/doctor_profile/", views.DoctorProfileView.as_view(), name="doctor-profile"),
+    path("profile/update/", views.ProfileUpdateView.as_view(), name="profile-update"),
 ]

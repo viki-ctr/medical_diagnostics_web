@@ -1,0 +1,76 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        <img src="/static/logo.png" alt="Логотип" height="40px" style="vertical-align: middle; margin-right: 10px;">
+        {{ site_header|default:_('Django administration') }}
+    </a>
+</h1>
+{% endblock %}
+
+{% block nav-global %}
+{% endblock %}
+
+{% block extrastyle %}
+<style>
+:root {
+    --primary: #4b6cb7;
+    --secondary: #182848;
+}
+
+#header {
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    color: white;
+}
+
+#branding h1 a:link, #branding h1 a:visited {
+    color: white;
+}
+
+.module h2, .module caption, .inline-group h2 {
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+}
+
+div.breadcrumbs {
+    background: var(--secondary);
+}
+
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+    background: var(--primary);
+}
+
+.button:hover, input[type=submit]:hover, input[type=button]:hover {
+    background: var(--secondary);
+}
+
+/* Улучшения для мобильных устройств */
+@media (max-width: 767px) {
+    #header {
+        padding: 10px;
+    }
+    #branding h1 {
+        font-size: 18px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block footer %}
+<div id="footer" style="padding: 10px; text-align: center; font-size: 12px;">
+    <p>
+        &copy; {% now "Y" %} {{ site_title|default:_('Моя компания') }} | 
+        Версия: 1.0.0 | 
+        <a href="/" style="color: var(--primary);">Вернуться на сайт</a>
+    </p>
+</div>
+{% endblock %}
+
+{% block userlinks %}
+    {% if user.is_active and user.is_staff %}
+        <a href="{% url 'admin:password_change' %}">Сменить пароль</a> /
+    {% endif %}
+    <a href="{% url 'admin:logout' %}">Выйти</a>
+{% endblock %}

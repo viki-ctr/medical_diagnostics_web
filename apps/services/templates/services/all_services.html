@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4">Все медицинские исследования</h1>
+    
+    <!-- Простая фильтрация по категориям -->
+    <div class="mb-4">
+        <h4>Категории:</h4>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{% url 'services:all_services' %}" 
+               class="btn btn-sm btn-outline-primary">
+                Все
+            </a>
+            {% for category in categories %}
+            <a href="{% url 'services:category' category.slug %}" 
+               class="btn btn-sm btn-outline-primary">
+                {{ category.name }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Список услуг -->
+    <div class="row">
+        {% for service in services %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+                {% if service.image %}
+                <img src="{{ service.image.url }}" class="card-img-top" alt="{{ service.name }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ service.name }}</h5>
+                    <p class="text-muted">{{ service.category.name }}</p>
+                    <p class="card-text">{{ service.short_description }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold">{{ service.price }} ₽</span>
+                        <a href="{% url 'services:detail' service.slug %}" class="btn btn-primary btn-sm">
+                            Подробнее
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                Исследования не найдены.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Простая пагинация -->
+    {% if is_paginated %}
+    <nav class="mt-4">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Назад</a>
+            </li>
+            {% endif %}
+            
+            <li class="page-item active">
+                <span class="page-link">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+            </li>
+            
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Вперед</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

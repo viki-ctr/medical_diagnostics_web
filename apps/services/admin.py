@@ -11,22 +11,23 @@ class ServiceCategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
 
     def get_queryset(self, request):
-        return super().get_queryset(request).annotate(
-            service_count=Count('services')
-        )
+        return super().get_queryset(request).annotate(service_count=Count("services"))
 
     def service_count(self, obj):
         return obj.service_count
 
-    service_count.admin_order_field = 'service_count'
+    service_count.admin_order_field = "service_count"
 
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ("name", "category", "price", "duration", "is_available")
-    list_filter = ("category", "is_available")
-    search_fields = ("name", "description", "preparation")
-    list_editable = ("is_available", "price")
+    list_display = ("name", "price", "duration", "is_available")
+    list_filter = ("is_available",)
+    search_fields = (
+        "name",
+        "description",
+    )
+    list_editable = ("is_available",)
     prepopulated_fields = {"slug": ("name",)}
     filter_horizontal = ()
     fieldsets = (

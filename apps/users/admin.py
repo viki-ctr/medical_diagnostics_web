@@ -8,8 +8,16 @@ User = get_user_model()
 
 
 class CustomUserAdmin(UserAdmin):
-    list_display = ("username", "email", "is_patient", "is_doctor", "is_staff")
-    list_filter = ("is_patient", "is_doctor", "is_staff", "is_superuser")
+    list_display = (
+        "username",
+        "email",
+        "is_patient",
+        "is_doctor",
+    )
+    list_filter = (
+        "is_patient",
+        "is_doctor",
+    )
     search_fields = ("username", "email", "first_name", "last_name")
     fieldsets = (
         (None, {"fields": ("username", "password")}),
@@ -43,8 +51,8 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(PatientProfile)
 class PatientProfileAdmin(admin.ModelAdmin):
-    list_display = ("user", "birth_date", "get_phone")
-    search_fields = ("user__username", "user__email", "user__first_name", "user__last_name")
+    list_display = ("user", "birth_date", "gender")
+    search_fields = ("user__username", "address")
     list_select_related = ("user",)
     raw_id_fields = ("user",)
 
@@ -56,9 +64,9 @@ class PatientProfileAdmin(admin.ModelAdmin):
 
 @admin.register(DoctorProfile)
 class DoctorProfileAdmin(admin.ModelAdmin):
-    list_display = ("user", "specialty", "get_email")
-    list_filter = ("specialty",)
-    search_fields = ("user__username", "specialty", "user__email")
+    list_display = ("user", "specialty", "department")
+    list_filter = ("specialty", "department")
+    search_fields = ("user__username", "qualification")
     filter_horizontal = ()
     raw_id_fields = ("user",)
 

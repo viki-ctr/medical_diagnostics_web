@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Левая колонка (профиль) -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <img src="{% static 'images/default-avatar.png' %}" class="rounded-circle mb-3" width="150" alt="Аватар">
+                    <h5>{{ user.username }}</h5>
+                    <p class="text-muted">{{ user.email }}</p>
+
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a href="{% url 'users:change-password' %}" class="text-decoration-none">
+                                <i class="fas fa-key me-1"></i> Сменить пароль
+                            </a>
+                        </li>
+                        {% if user.patientprofile %}
+                        <li class="mb-2">
+                            <a href="{% url 'users:patient-profile' %}" class="text-decoration-none">
+                                <i class="fas fa-user-injured me-1"></i> Профиль пациента
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% if user.doctorprofile %}
+                        <li>
+                            <a href="{% url 'users:doctor-profile' %}" class="text-decoration-none">
+                                <i class="fas fa-user-md me-1"></i> Профиль врача
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Правая колонка (форма редактирования) -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Мои данные</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'users:profile-update' %}">
+                        {% csrf_token %}
+
+                        <!-- Поле username -->
+                        <div class="mb-3">
+                            <label for="id_username" class="form-label">Логин</label>
+                            <input type="text" name="username" class="form-control bg-light"
+                                   id="id_username" value="{{ user.username }}" readonly>
+                        </div>
+
+                        <!-- Поле email -->
+                        <div class="mb-3">
+                            <label for="id_email" class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control"
+                                   id="id_email" value="{{ user.email|default:'' }}">
+                        </div>
+
+                        <!-- Поле first_name -->
+                        <div class="mb-3">
+                            <label for="id_first_name" class="form-label">Имя</label>
+                            <input type="text" name="first_name" class="form-control"
+                                   id="id_first_name" value="{{ user.first_name|default:'' }}">
+                        </div>
+
+                        <!-- Поле last_name -->
+                        <div class="mb-3">
+                            <label for="id_last_name" class="form-label">Фамилия</label>
+                            <input type="text" name="last_name" class="form-control"
+                                   id="id_last_name" value="{{ user.last_name|default:'' }}">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary mt-3">Сохранить изменения</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,170 +1,110 @@
-from django.contrib.auth import get_user_model
-from django.contrib.auth.views import LogoutView as DjangoLogoutView
-from django.views.generic import TemplateView
-from rest_framework import generics, mixins, permissions, status, viewsets
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import TokenObtainPairView
+from django.contrib import messages
+from django.contrib.auth import get_user_model, login, logout
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView as DjangoLoginView
+from django.contrib.auth.views import PasswordChangeView
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
+from django.views.generic import FormView, TemplateView, UpdateView
 
+from .forms import (ChangePasswordForm, DoctorProfileForm, LoginForm, PatientProfileForm, ProfileUpdateForm,
+                    RegisterForm)
 from .models import DoctorProfile, PatientProfile
-from .serializers import (ChangePasswordSerializer, CustomTokenObtainPairSerializer, DoctorProfileSerializer,
-                          PatientProfileSerializer, RegisterSerializer, UserSerializer)
 
 User = get_user_model()
 
 
-class RegisterAPIView(generics.CreateAPIView):
-    """
-    Регистрация нового пользователя+
-    POST /api/users/register/
-    """
-
-    queryset = User.objects.all()
-    serializer_class = RegisterSerializer
-    permission_classes = [permissions.AllowAny]
-
-
-class CustomTokenObtainPairView(TokenObtainPairView):
-    """
-    Получение JWT токена (вход)
-    POST /api/users/login/
-    """
-
-    serializer_class = CustomTokenObtainPairSerializer
-
-    def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
-        if response.status_code == 200:
-            user = User.objects.get(username=request.data["username"])
-            response.data["user"] = UserSerializer(user).data
-        return response
-
-
-class CurrentUserAPIView(generics.RetrieveAPIView):
-    """
-    Получение данных текущего пользователя
-    GET /api/users/me/
-    """
-
-    serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_object(self):
-        return self.request.user
-
-
-class ChangePasswordAPIView(generics.UpdateAPIView):
-    """
-    Смена пароля
-    PUT /api/users/change-password/
-    """
-
-    serializer_class = ChangePasswordSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_object(self):
-        return self.request.user
-
-    def update(self, request, *args, **kwargs):
-        user = self.get_object()
-        serializer = self.get_serializer(data=request.data)
-
-        if serializer.is_valid():
-            if not user.check_password(serializer.data.get("old_password")):
-                return Response({"old_password": ["Неверный текущий пароль"]}, status=status.HTTP_400_BAD_REQUEST)
-            user.set_password(serializer.data.get("new_password"))
-            user.save()
-            return Response({"status": "Пароль успешно изменен"})
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class UserViewSet(generics.ListAPIView):
-    """
-    Список пользователей (только для администраторов)
-    GET /api/users/
-    """
-
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [permissions.IsAdminUser]
-
-
-class PatientProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
-    """
-    Профиль пациента
-    GET, PUT /api/users/patients/<id>/
-    """
-
-    queryset = PatientProfile.objects.all()
-    serializer_class = PatientProfileSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_permissions(self):
-        if self.request.method == "PUT":
-            return [permissions.IsAuthenticated(), permissions.IsAdminUser()]
-        return [permissions.IsAuthenticated()]
-
-
-class DoctorProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
-    """
-    Профиль врача
-    GET, PUT /api/users/doctors/<id>/
-    """
-
-    queryset = DoctorProfile.objects.all()
-    serializer_class = DoctorProfileSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def __str__(self):
-        return f"{self.user.username} profile"
-
-    def get_permissions(self):
-        if self.request.method == "PUT":
-            return [permissions.IsAuthenticated(), permissions.IsAdminUser()]
-        return [permissions.IsAuthenticated()]
-
-
-class LogoutAPIView(APIView):
-    def post(self, request):
-        try:
-            refresh_token = request.data.get("refresh_token")
-            token = RefreshToken(refresh_token)
-            token.blacklist()
-            return Response(status=status.HTTP_205_RESET_CONTENT)
-        except Exception as e:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-class LoginView(TemplateView):
-    template_name = "users/login.html"
-
-
-class RegisterView(TemplateView):
+class RegisterView(FormView):
     template_name = "users/register.html"
+    form_class = RegisterForm
+    success_url = reverse_lazy("users:profile")
+
+    def form_valid(self, form):
+        user = form.save(commit=False)
+        user.set_password(form.cleaned_data["password2"])
+        user.save()
+
+        if hasattr(User, "patient_profile"):
+            PatientProfile.objects.create(user=user)
+        elif hasattr(User, "doctor_profile"):
+            DoctorProfile.objects.create(user=user)
+
+        login(self.request, user)
+        return super().form_valid(form)
 
 
-class ProfileView(TemplateView):
-    template_name = "users/profile.html"
+class LoginView(DjangoLoginView):
+    template_name = "users/login.html"
+    form_class = LoginForm
+    redirect_authenticated_user = True
+
+    def get_success_url(self):
+        return reverse_lazy("users:profile")
+
+
+class LogoutView(LoginRequiredMixin, TemplateView):
+    template_name = "users/logout.html"
+
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        return super().get(request, *args, **kwargs)
+
+
+class ProfileView(LoginRequiredMixin, TemplateView):
+    template_name = "users/profile/profile.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['user'] = self.request.user
+        user = self.request.user
+        context["user"] = user
+
+        if hasattr(user, "patient_profile"):
+            context["profile"] = user.patient_profile
+        elif hasattr(user, "doctor_profile"):
+            context["profile"] = user.doctor_profile
+
         return context
 
 
-class ChangePasswordView(TemplateView):
-    template_name = "users/change_password.html"
+class ProfileUpdateView(LoginRequiredMixin, UpdateView):
+    form_class = ProfileUpdateForm
+    template_name = "users/profile/profile.html"
+    success_url = reverse_lazy("users:profile")
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def form_valid(self, form):
+        messages.success(self.request, "Профиль успешно обновлен")
+        return super().form_valid(form)
 
 
-class LogoutView(DjangoLogoutView):
-    next_page = "home"
+class ChangePasswordView(PasswordChangeView):
+    template_name = "users/password/change_password.html"
+    form_class = ChangePasswordForm
+    success_url = "/users/password/change-password-done/"
+
+    def form_valid(self, form):
+        user = self.request.user
+        user.set_password(form.cleaned_data["new_password1"])
+        user.save()
+        login(self.request, user)
+        return super().form_valid(form)
 
 
-class PatientProfileView(TemplateView):
-    template_name = "users/patient_profile.html"
+class PatientProfileView(LoginRequiredMixin, UpdateView):
+    template_name = "users/profile/patient_profile.html"
+    form_class = PatientProfileForm
+    success_url = reverse_lazy("users:profile")
+
+    def get_object(self, queryset=None):
+        return self.request.user.patient_profile
 
 
-class DoctorProfileView(TemplateView):
-    template_name = "users/doctor_profile.html"
+class DoctorProfileView(LoginRequiredMixin, UpdateView):
+    template_name = "users/profile/doctor_profile.html"
+    form_class = DoctorProfileForm
+    success_url = reverse_lazy("users:profile")
+
+    def get_object(self, queryset=None):
+        return self.request.user.doctor_profile

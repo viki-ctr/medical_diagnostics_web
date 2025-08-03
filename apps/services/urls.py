@@ -1,27 +1,13 @@
-from django.urls import include, path
-from rest_framework.routers import DefaultRouter
+from django.urls import path
 
 from . import views
-from .views import PopularServicesAPIView, ServiceCategoryViewSet, ServiceViewSet
 
 app_name = "services"
 
-
-# Для API
-router = DefaultRouter()
-router.register(r"services", ServiceViewSet, basename="service")
-router.register(r"categories", ServiceCategoryViewSet, basename="category")
-
-api_urlpatterns = [
-    path("api/", include(router.urls)),
-    path("api/popular/", PopularServicesAPIView.as_view(), name="popular-services-api"),
-]
-
-
 urlpatterns = [
-    path("", views.ServiceListView.as_view(), name="list"),
-    path("category/<slug:category_slug>/", views.ServiceListView.as_view(), name="category"),
-    path("<slug:slug>/", views.ServiceDetailView.as_view(), name="detail"),
+    path("", views.ServiceHomeView.as_view(), name="home"),
+    path("services/", views.AllServicesView.as_view(), name="all_services"),
+    path("services/category/", views.ServiceCategoryListView.as_view(), name="list"),
+    path("services/category/<slug:slug>/", views.ServiceCategoryListView.as_view(), name="list_by_category"),
+    path("services/<slug:slug>/", views.ServiceDetailView.as_view(), name="detail"),
 ]
-
-urlpatterns += api_urlpatterns

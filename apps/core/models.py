@@ -104,6 +104,9 @@ class HomePageContent(models.Model):
             HomePageContent.objects.exclude(pk=self.pk).update(is_active=False)
         super().save(*args, **kwargs)
 
+    def get_testimonials_title(self):
+        return self.testimonials_title or "Отзывы наших пациентов"
+
 
 class Testimonial(models.Model):
     """
@@ -128,6 +131,9 @@ class Testimonial(models.Model):
 
     def stars(self):
         return "★" * self.rating + "☆" * (5 - self.rating)
+
+    def get_short_content(self):
+        return self.content[:100] + "..." if len(self.content) > 100 else self.content
 
 
 class FAQ(models.Model):
