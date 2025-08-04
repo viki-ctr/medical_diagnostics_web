@@ -5,7 +5,7 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'services:list' %}">Диагностика</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'services:category' service.category.slug %}">{{ service.category.name }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'services:list_by_category' service.category.slug %}">{{ service.category.name }}</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{ service.name }}</li>
         </ol>
     </nav>
@@ -116,9 +116,7 @@
                 </div>
                 <div class="card-body">
                     <p class="card-text">Не знаете, какое исследование вам нужно?</p>
-                    <a href="{% url 'consultations:create' %}" class="btn btn-outline-primary">
-                        <i class="fas fa-comment-medical me-2"></i>Получить консультацию
-                    </a>
+                    <a href="/consult/">Получить консультацию</a>
                 </div>
             </div>
         </div>

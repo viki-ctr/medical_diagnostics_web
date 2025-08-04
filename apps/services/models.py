@@ -8,8 +8,8 @@ class ServiceCategory(models.Model):
     icon = models.CharField(
         max_length=50,
         default="fa-flask",
-        blank=True,  # Разрешаем пустое значение
-        null=True,  # Разрешаем NULL в базе
+        blank=True,
+        null=True,
         help_text="Font Awesome icon class (например, 'fa-heart')",
     )
     is_main = models.BooleanField(default=False)

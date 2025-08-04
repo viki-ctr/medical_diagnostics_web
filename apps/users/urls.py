@@ -20,4 +20,24 @@ urlpatterns = [
     path("profile/patient_profile/", views.PatientProfileView.as_view(), name="patient-profile"),
     path("profile/doctor_profile/", views.DoctorProfileView.as_view(), name="doctor-profile"),
     path("profile/update/", views.ProfileUpdateView.as_view(), name="profile-update"),
+    path('password-reset/',
+         auth_views.PasswordResetView.as_view(
+             template_name='users/password/reset.html'
+         ),
+         name='password_reset'),
+    path('password-reset/done/',
+         auth_views.PasswordResetDoneView.as_view(
+             template_name='users/password/reset_done.html'
+         ),
+         name='password_reset_done'),
+    path('password-reset-confirm/<uidb64>/<token>/',
+         auth_views.PasswordResetConfirmView.as_view(
+             template_name='users/password/reset_confirm.html'
+         ),
+         name='password_reset_confirm'),
+    path('password-reset-complete/',
+         auth_views.PasswordResetCompleteView.as_view(
+             template_name='users/password/reset_complete.html'
+         ),
+         name='password_reset_complete'),
 ]

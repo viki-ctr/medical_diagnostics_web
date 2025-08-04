@@ -50,3 +50,23 @@ class TestUsersUrls(SimpleTestCase):
         url = reverse("users:profile-update")
         self.assertEqual(resolve(url).func.view_class, views.ProfileUpdateView)
         self.assertEqual(url, "/users/profile/update/")
+
+    def test_password_reset_url_resolves(self):
+        url = reverse("users:password_reset")
+        self.assertEqual(resolve(url).func.view_class, auth_views.PasswordResetView)
+        self.assertEqual(url, "/users/password-reset/")
+
+    def test_password_reset_done_url_resolves(self):
+        url = reverse("users:password_reset_done")
+        self.assertEqual(resolve(url).func.view_class, auth_views.PasswordResetDoneView)
+        self.assertEqual(url, "/users/password-reset/done/")
+
+    def test_password_reset_confirm_url_resolves(self):
+        url = reverse("users:password_reset_confirm", args=["MQ", "abc123-xyz456"])
+        self.assertEqual(resolve(url).func.view_class, auth_views.PasswordResetConfirmView)
+        self.assertEqual(url, "/users/password-reset-confirm/MQ/abc123-xyz456/")
+
+    def test_password_reset_complete_url_resolves(self):
+        url = reverse("users:password_reset_complete")
+        self.assertEqual(resolve(url).func.view_class, auth_views.PasswordResetCompleteView)
+        self.assertEqual(url, "/users/password-reset-complete/")

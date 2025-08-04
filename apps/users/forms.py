@@ -9,12 +9,14 @@ User = get_user_model()
 
 
 class RegisterForm(forms.ModelForm):
-    password = forms.CharField(
+    password1 = forms.CharField(
         widget=forms.PasswordInput(attrs={"class": "form-control"}),
         help_text="Пароль должен содержать минимум 8 символов",
+        label="Пароль"
     )
     password2 = forms.CharField(
-        widget=forms.PasswordInput(attrs={"class": "form-control"}), label="Подтверждение пароля"
+        widget=forms.PasswordInput(attrs={"class": "form-control"}),
+        label="Подтверждение пароля"
     )
 
     class Meta:
@@ -29,11 +31,18 @@ class RegisterForm(forms.ModelForm):
 
     def clean_password2(self):
         cd = self.cleaned_data
-        if cd["password"] != cd["password2"]:
+        if cd["password1"] != cd["password2"]:
             raise ValidationError("Пароли не совпадают.")
-        if len(cd["password"]) < 8:
+        if len(cd["password1"]) < 8:
             raise ValidationError("Пароль должен содержать минимум 8 символов.")
         return cd["password2"]
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data["password1"])
+        if commit:
+            user.save()
+        return user
 
 
 class LoginForm(AuthenticationForm):

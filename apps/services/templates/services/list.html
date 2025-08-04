@@ -16,7 +16,7 @@
                             Все категории
                         </a>
                         {% for category in categories %}
-                        <a href="{% url 'services:category' category.slug %}"
+                        <a href="{% url 'services:list_by_category' category.slug %}"
                            class="list-group-item list-group-item-action {% if category == active_category %}active{% endif %}">
                             {{ category.name }} ({{ category.services.count }})
                         </a>

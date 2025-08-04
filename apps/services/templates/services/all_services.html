@@ -3,17 +3,16 @@
 {% block content %}
 <div class="container my-5">
     <h1 class="mb-4">Все медицинские исследования</h1>
-    
-    <!-- Простая фильтрация по категориям -->
+
     <div class="mb-4">
         <h4>Категории:</h4>
         <div class="d-flex flex-wrap gap-2">
-            <a href="{% url 'services:all_services' %}" 
+            <a href="{% url 'services:list' %}"
                class="btn btn-sm btn-outline-primary">
                 Все
             </a>
             {% for category in categories %}
-            <a href="{% url 'services:category' category.slug %}" 
+            <a href="{% url 'services:list_by_category' category.slug %}"
                class="btn btn-sm btn-outline-primary">
                 {{ category.name }}
             </a>
@@ -60,11 +59,11 @@
                 <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Назад</a>
             </li>
             {% endif %}
-            
+
             <li class="page-item active">
                 <span class="page-link">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
             </li>
-            
+
             {% if page_obj.has_next %}
             <li class="page-item">
                 <a class="page-link" href="?page={{ page_obj.next_page_number }}">Вперед</a>

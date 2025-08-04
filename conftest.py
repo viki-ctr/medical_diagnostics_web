@@ -1,5 +1,6 @@
 import pytest
 from faker import Faker
+from model_bakery import baker
 
 
 @pytest.fixture(scope="session")
@@ -20,3 +21,25 @@ def cleanup_db(db):
 
     User = get_user_model()
     User.objects.all().delete()
+
+
+@pytest.fixture
+def service_factory():
+    def factory(**kwargs):
+        return baker.make("services.Service", **kwargs)
+    return factory
+
+@pytest.fixture
+def service_category_factory():
+    def factory(**kwargs):
+        return baker.make("services.ServiceCategory", **kwargs)
+    return factory
+
+
+@pytest.fixture
+def category():
+    return baker.make('services.ServiceCategory')
+
+@pytest.fixture
+def service(category):
+    return baker.make('services.Service', category=category)

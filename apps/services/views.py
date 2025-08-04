@@ -31,20 +31,21 @@ class ServiceCategoryListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        queryset = super().get_queryset().filter(is_available=True)
+        queryset = super().get_queryset().filter(is_available=True).order_by('id')
         slug = self.kwargs.get("slug")
+
         if slug:
             self.category = get_object_or_404(ServiceCategory, slug=slug)
             queryset = queryset.filter(category=self.category)
-        return queryset.select_related("category")
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if hasattr(self, "category"):
-            context["category"] = self.category
-        context["categories"] = ServiceCategory.objects.annotate(service_count=Count("services")).filter(
-            service_count__gt=0
-        )
+        if hasattr(self, 'category'):
+            context['category'] = self.category
+        context['categories'] = ServiceCategory.objects.annotate(
+            service_count=Count('services')
+        ).filter(service_count__gt=0)
         return context
 
 
@@ -69,7 +70,7 @@ class AllServicesView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        return Service.objects.filter(is_available=True).select_related("category")
+        return Service.objects.filter(is_available=True).select_related('category').order_by('id')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

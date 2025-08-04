@@ -196,6 +196,6 @@ if "test" in sys.argv:
         "django.contrib.auth.hashers.MD5PasswordHasher",
     ]
 
-
-LOGOUT_REDIRECT_URL = "home"
-LOGIN_REDIRECT_URL = "users:profile"
+LOGIN_URL = 'users:login'
+LOGIN_REDIRECT_URL = 'users:profile'
+LOGOUT_REDIRECT_URL = 'users:login'
