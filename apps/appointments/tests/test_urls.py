@@ -1,10 +1,10 @@
-from django.test import SimpleTestCase
+from django.test import TestCase
 from django.urls import reverse, resolve
 
 from apps.appointments.views import AppointmentListView, AppointmentCreateView, DoctorScheduleView, AvailableSlotsView
 
 
-class TestAppointmentsUrls(SimpleTestCase):
+class TestAppointmentsUrls(TestCase):
     def test_list_url_resolves(self):
         """Проверка URL списка записей"""
         url = reverse("appointments:list")

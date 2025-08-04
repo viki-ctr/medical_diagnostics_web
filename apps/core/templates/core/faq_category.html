@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Вопросы по категории: {{ category.name }} | {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'faq-list' %}">Частые вопросы</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ category.name }}</li>
+                </ol>
+            </nav>
+
+            <h1 class="mb-4">Частые вопросы: {{ category.name }}</h1>
+
+            <div class="accordion" id="faqAccordion">
+                {% for question in questions %}
+                <div class="card mb-3">
+                    <div class="card-header" id="heading{{ forloop.counter }}">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" 
+                                    data-target="#collapse{{ forloop.counter }}" aria-expanded="true" 
+                                    aria-controls="collapse{{ forloop.counter }}">
+                                {{ question.question }}
+                            </button>
+                        </h2>
+                    </div>
+
+                    <div id="collapse{{ forloop.counter }}" class="collapse" 
+                         aria-labelledby="heading{{ forloop.counter }}" data-parent="#faqAccordion">
+                        <div class="card-body">
+                            {{ question.answer|linebreaks }}
+                            {% if question.additional_info %}
+                            <div class="alert alert-info mt-3">
+                                {{ question.additional_info }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="alert alert-info">
+                    В этой категории пока нет вопросов.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Все категории</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% for cat in all_categories %}
+                        <li class="list-group-item {% if cat.slug == category.slug %}active{% endif %}">
+                            <a href="{% url 'faq-category' cat.slug %}" 
+                               class="{% if cat.slug == category.slug %}text-white{% endif %}">
+                                {{ cat.name }} ({{ cat.question_count }})
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Анимация аккордеона
+document.addEventListener('DOMContentLoaded', function() {
+    const accordionItems = document.querySelectorAll('.accordion .card-header button');
+    accordionItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const icon = this.querySelector('.fa');
+            if (icon) {
+                icon.classList.toggle('fa-plus');
+                icon.classList.toggle('fa-minus');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

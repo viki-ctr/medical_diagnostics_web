@@ -41,7 +41,7 @@ class FeedbackListView(LoginRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        return Feedback.objects.order_by("-created_at")
+        return super().get_queryset().filter(is_published=True)
 
 
 class FeedbackUpdateView(LoginRequiredMixin, UpdateView):

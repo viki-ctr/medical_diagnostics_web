@@ -15,7 +15,6 @@ User = get_user_model()
 class AppointmentFormTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-
         cls.category = ServiceCategory.objects.create(
             name="Основные услуги",
             slug="main-services",
@@ -36,16 +35,32 @@ class AppointmentFormTest(TestCase):
         )
 
         cls.doctor_user = User.objects.create_user(
-            username="doctor", password="testpass123", email="doctor@example.com", is_doctor=True
+            username="doctor",
+            password="testpass123",
+            email="doctor@example.com",
+            is_doctor=True,
+            first_name="Иван",
+            last_name="Петров"
         )
         cls.patient_user = User.objects.create_user(
-            username="patient", password="testpass123", email="patient@example.com", is_patient=True
+            username="patient",
+            password="testpass123",
+            email="patient@example.com",
+            is_patient=True,
+            first_name="Мария",
+            last_name="Сидорова"
         )
 
         cls.doctor = DoctorProfile.objects.create(
-            user=cls.doctor_user, specialty="Терапевт", department="Терапевтическое отделение"
+            user=cls.doctor_user,
+            specialty="Терапевт",
+            department="Терапевтическое отделение"
         )
-        cls.patient = PatientProfile.objects.create(user=cls.patient_user, gender="M", phone="+79991234567")
+        cls.patient = PatientProfile.objects.create(
+            user=cls.patient_user,
+            gender="M",
+            phone="+79991234567"
+        )
 
     def test_form_fields(self):
         """Тест наличия полей формы"""
@@ -57,15 +72,15 @@ class AppointmentFormTest(TestCase):
 
     def test_form_validation_valid_data(self):
         """Тест валидации с корректными данными"""
-        future_date = timezone.now() + timedelta(days=1)
         form_data = {
             'doctor': self.doctor.id,
             'service': self.service.id,
-            'appointment_date': future_date.strftime('%Y-%m-%dT%H:%M'),
+            'appointment_date': '2024-01-01T10:00',
             'notes': 'Тестовая запись'
         }
         form = AppointmentForm(data=form_data)
         self.assertTrue(form.is_valid(), f"Form errors: {form.errors}")
+
 
     def test_form_for_doctor_user(self):
         """Тест формы для пользователя-врача"""

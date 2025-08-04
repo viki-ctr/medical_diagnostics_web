@@ -25,16 +25,17 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'core:team_list' %}">Врачи</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'core:testimonial_list' %}">Отзывы пациентов</a>
+                </li>
             </ul>
             
             <div class="d-flex align-items-center">
-                <!-- Поиск (если нужен) -->
                 <form class="d-flex me-3">
                     <input class="form-control me-2" type="search" placeholder="Поиск" aria-label="Search">
                     <button class="btn btn-outline-light" type="submit">Найти</button>
                 </form>
-                
-                <!-- Блок авторизации -->
+
                 <div id="authBlock" class="d-flex">
                     {% if user.is_authenticated %}
                     <div class="dropdown">

@@ -1,11 +1,11 @@
-from django.test import SimpleTestCase
+from django.test import TestCase
 from django.urls import reverse, resolve
 from django.contrib.auth import views as auth_views
 
 from apps.users import views
 
 
-class TestUsersUrls(SimpleTestCase):
+class TestUsersUrls(TestCase):
     def test_register_url_resolves(self):
         url = reverse("users:register")
         self.assertEqual(resolve(url).func.view_class, views.RegisterView)

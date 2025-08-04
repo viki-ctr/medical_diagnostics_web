@@ -26,7 +26,7 @@ document.getElementById('id_doctor').addEventListener('change', updateSlots);
 document.getElementById('id_appointment_date').addEventListener('change', function() {
     if (this.value) {
         const date = this.value.split('T')[0];
-        this.value = '';  // Сбрасываем время
+        this.value = '';
         updateSlots(date);
     }
 });

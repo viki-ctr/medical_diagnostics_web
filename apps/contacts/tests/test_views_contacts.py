@@ -46,12 +46,10 @@ class BranchesListViewTest(TestCase):
         cls.branch3 = Branch.objects.create(name="Branch 3", order=3)
 
     def test_view_uses_correct_template(self):
-        # Проверяем только что view использует правильный шаблон, без рендеринга
         view = BranchesListView()
         self.assertEqual(view.template_name, "contacts/branches_list.html")
 
     def test_view_ordering(self):
-        # Тестируем сортировку без рендеринга шаблона
         view = BranchesListView()
         queryset = view.get_queryset()
         self.assertEqual(queryset[0].name, "Branch 2")
@@ -59,7 +57,6 @@ class BranchesListViewTest(TestCase):
         self.assertEqual(queryset[2].name, "Branch 3")
 
     def test_view_context_object_name(self):
-        # Проверяем имя переменной контекста
         view = BranchesListView()
         self.assertEqual(view.context_object_name, "branches")
 
@@ -89,7 +86,7 @@ class FeedbackListViewTest(TestCase):
 
     def test_login_required(self):
         response = self.client.get(reverse("contacts:feedback-list"))
-        self.assertEqual(response.status_code, 302)  # Редирект на страницу входа
+        self.assertEqual(response.status_code, 302)
 
     def test_authenticated_access(self):
         self.client.login(username="testuser", password="12345")
@@ -104,7 +101,6 @@ class FeedbackListViewTest(TestCase):
 
     def test_pagination(self):
         self.client.login(username="testuser", password="12345")
-        # Создаем больше объектов для проверки пагинации
         for i in range(25):
             Feedback.objects.create(
                 name=f"Feedback {i+3}",

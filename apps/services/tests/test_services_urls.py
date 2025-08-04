@@ -1,10 +1,10 @@
-from django.test import SimpleTestCase
+from django.test import TestCase
 from django.urls import reverse, resolve
 
 from apps.services import views
 
 
-class TestServicesUrls(SimpleTestCase):
+class TestServicesUrls(TestCase):
     def test_service_home_url_resolves(self):
         url = reverse("services:home")
         self.assertEqual(resolve(url).func.view_class, views.ServiceHomeView)

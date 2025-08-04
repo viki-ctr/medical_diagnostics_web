@@ -1,11 +1,11 @@
-from django.test import SimpleTestCase
+from django.test import TestCase
 from django.urls import reverse, resolve
 
 from apps.core.views import HomeView, AboutView, FAQListView, FAQCategoryView, TeamListView, DepartmentDetailView, \
     TestimonialListView
 
 
-class TestCoreUrls(SimpleTestCase):
+class TestCoreUrls(TestCase):
     def test_home_url_resolves(self):
         url = reverse("core:home")
         self.assertEqual(resolve(url).func.view_class, HomeView)
