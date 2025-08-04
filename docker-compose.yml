@@ -4,14 +4,16 @@ services:
   db:
     image: postgres:14
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-medical_db}
+      POSTGRES_USER: ${POSTGRES_USER:-medical_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-medical_password}
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
     restart: unless-stopped
+    networks:
+      - app_network
 
   web:
     build: .
@@ -23,9 +25,11 @@ services:
     depends_on:
       - db
     environment:
-      DATABASE_URL: postgres://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@postgres:5432/${{ secrets.POSTGRES_DB }}
-      SECRET_KEY: ${SECRET_KEY}
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      SECRET_KEY: ${SECRET_KEY:-django-insecure-default-secret-key}
     restart: unless-stopped
+    networks:
+      - app_network
 
   nginx:
     image: nginx:latest
@@ -37,6 +41,12 @@ services:
     depends_on:
       - web
     restart: unless-stopped
+    networks:
+      - app_network
 
 volumes:
   postgres_data:
+
+networks:
+  app_network:
+    driver: bridge
