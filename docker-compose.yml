@@ -23,7 +23,7 @@ services:
     depends_on:
       - db
     environment:
-      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      DATABASE_URL: postgres://${POSTGRES_USER:-medical_user}:${POSTGRES_PASSWORD:-medical_password}@db:5432/${POSTGRES_DB:-medical_db}
       SECRET_KEY: ${SECRET_KEY:-django-insecure-default-secret-key}
     restart: unless-stopped
     networks:

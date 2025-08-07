@@ -3,7 +3,10 @@ from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.auth.views import PasswordChangeView
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import FormView, TemplateView, UpdateView
 
 from .forms import (ChangePasswordForm, DoctorProfileForm, LoginForm, PatientProfileForm, ProfileUpdateForm,
@@ -41,12 +44,14 @@ class LoginView(DjangoLoginView):
         return reverse_lazy("users:profile")
 
 
-class LogoutView(LoginRequiredMixin, TemplateView):
-    template_name = "users/logout.html"
+class LogoutView(LoginRequiredMixin, View):  # Изменяем с TemplateView на View
+    def post(self, request, *args, **kwargs):
+        logout(request)
+        return HttpResponseRedirect(reverse_lazy("users:login"))  # Или возвращаем JSON для API
 
     def get(self, request, *args, **kwargs):
         logout(request)
-        return super().get(request, *args, **kwargs)
+        return render(request, "users/logout.html")
 
 
 class ProfileView(LoginRequiredMixin, TemplateView):
