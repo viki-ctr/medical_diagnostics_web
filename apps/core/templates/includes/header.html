@@ -1,0 +1,99 @@
+{% load static %}
+
+<header class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'core:home' %}">
+            {% if site_settings.logo %}
+            <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_name }}" height="40">
+            {% else %}
+            {{ site_settings.site_name|default:"МедДиагностика" }}
+            {% endif %}
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'core:home' %}">Главная</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'core:about' %}">О клинике</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'core:team_list' %}">Врачи</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'core:testimonial_list' %}">Отзывы пациентов</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'services:home' %}">Услуги</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href=" /contacts/">Контакты</a>
+                </li>
+            </ul>
+            
+            <div class="d-flex align-items-center">
+                <form class="d-flex me-3">
+                    <input class="form-control me-2" type="search" placeholder="Поиск" aria-label="Search">
+                    <button class="btn btn-outline-light" type="submit">Найти</button>
+                </form>
+
+                <div id="authBlock" class="d-flex">
+                    {% if user.is_authenticated %}
+                    <div class="dropdown">
+                        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" 
+                           id="userDropdown" data-bs-toggle="dropdown">
+                            {% if user.patient_profile.photo %}
+                            <img src="{{ user.patient_profile.photo.url }}" width="32" height="32" 
+                                 class="rounded-circle me-2">
+                            {% elif user.doctor_profile.photo %}
+                            <img src="{{ user.doctor_profile.photo.url }}" width="32" height="32" 
+                                 class="rounded-circle me-2">
+                            {% else %}
+                            <i class="fas fa-user-circle fa-lg me-1"></i>
+                            {% endif %}
+                            <span>{{ user.username }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'users:profile' %}">
+                                    <i class="fas fa-user me-1"></i> Профиль
+                                </a>
+                            </li>
+                            {% if user.is_staff %}
+                            <li>
+                                <a class="dropdown-item" href="{% url 'admin:index' %}">
+                                    <i class="fas fa-cog me-1"></i> Админка
+                                </a>
+                            </li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'users:logout' %}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                    <i class="fas fa-sign-out-alt me-1"></i> Выйти
+                                </a>
+                                <form id="logout-form" action="{% url 'users:logout' %}" method="POST" style="display: none;">
+                                    {% csrf_token %}
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                    {% else %}
+                    <div class="btn-group">
+                        <a href="{% url 'users:login' %}" class="btn btn-outline-light me-2">Войти</a>
+                        <a href="{% url 'users:register' %}" class="btn btn-light">Регистрация</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<script>
+
+</script>

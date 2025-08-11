@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ about_page.title }}</h1>
+
+    <section class="about-content">
+        {{ about_page.content|linebreaks }}
+    </section>
+
+    <section class="team-section">
+        <h2>Наша команда</h2>
+        <div class="department-tabs">
+            {% for department in departments %}
+            <a href="{% url 'core:department_detail' department.pk %}"
+               class="tab-button {% if forloop.first %}active{% endif %}">
+                {{ department.name }}
+            </a>
+            {% endfor %}
+        </div>
+
+        <div class="team-grid">
+            {% for member in team_members|slice:":6" %}
+            <div class="team-card">
+                {% if member.photo %}
+                <img src="{{ member.photo.url }}" alt="{{ member.name }}">
+                {% endif %}
+                <h3>{{ member.name }}</h3>
+                <p class="position">{{ member.position }}</p>
+                <p class="specialization">{{ member.specialization }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}

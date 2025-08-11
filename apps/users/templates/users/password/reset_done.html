@@ -1,0 +1,10 @@
+{% extends "users/base_account.html" %}
+
+{% block account_title %}Письмо отправлено{% endblock %}
+
+{% block account_content %}
+<div class="alert alert-success">
+    Инструкции по сбросу пароля отправлены на ваш email.
+</div>
+<a href="{% url 'users:login' %}" class="btn btn-primary">Вернуться к входу</a>
+{% endblock %}

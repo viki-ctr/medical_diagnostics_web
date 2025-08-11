@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Новая запись на прием</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Записаться</button>
+    </form>
+</div>
+
+<div class="form-group">
+    <label for="id_appointment_date">Дата и время</label>
+    <input type="datetime-local" name="appointment_date" required id="id_appointment_date" class="form-control">
+    <small class="form-text text-muted">
+        Сначала выберите врача и дату, чтобы увидеть доступные время
+    </small>
+    <div id="time-slots-container">
+    </div>
+</div>
+
+<script>
+// JavaScript для динамической загрузки слотов
+document.getElementById('id_doctor').addEventListener('change', updateSlots);
+document.getElementById('id_appointment_date').addEventListener('change', function() {
+    if (this.value) {
+        const date = this.value.split('T')[0];
+        this.value = '';
+        updateSlots(date);
+    }
+});
+
+function updateSlots(date = null) {
+    const doctorId = document.getElementById('id_doctor').value;
+    const serviceId = document.getElementById('id_service').value;
+    const dateInput = document.getElementById('id_appointment_date');
+
+    if (!date) date = dateInput.value.split('T')[0];
+    if (!doctorId || !serviceId || !date) return;
+
+    fetch(`{% url 'appointments:available-slots' %}?doctor=${doctorId}&service=${serviceId}&date=${date}`)
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('time-slots-container').innerHTML = html;
+        });
+}
+</script>
+{% endblock %}

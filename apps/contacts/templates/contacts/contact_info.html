@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Контакты</h1>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    Контактная информация
+                </div>
+                <div class="card-body">
+                    <p><i class="bi bi-geo-alt-fill"></i> <strong>Адрес:</strong> {{ contact_info.address }}</p>
+                    <p><i class="bi bi-telephone-fill"></i> <strong>Телефон:</strong> {{ contact_info.phone }}</p>
+                    <p><i class="bi bi-envelope-fill"></i> <strong>Email:</strong> {{ contact_info.email }}</p>
+
+                    <h5 class="mt-4">Режим работы:</h5>
+                    <ul class="list-unstyled">
+                        {% for hours in contact_info.get_working_hours_list %}
+                            <li>{{ hours }}</li>
+                        {% empty %}
+                            <li>Режим работы не указан</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            {% if contact_info.map_embed_code %}
+                <div class="map-container mb-4">
+                    {{ contact_info.map_embed_code|safe }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{% url 'contacts:branches-list' %}" class="btn btn-outline-primary">
+            Все филиалы нашей клиники
+        </a>
+    </div>
+</div>
+{% endblock %}

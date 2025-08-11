@@ -19,4 +19,14 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+
+    from django.core.management import execute_from_command_line
+
+    if "test" in sys.argv:
+        import multiprocessing
+
+        num_cores = multiprocessing.cpu_count()
+        sys.argv.extend(["--parallel", str(num_cores)])
+
+    execute_from_command_line(sys.argv)

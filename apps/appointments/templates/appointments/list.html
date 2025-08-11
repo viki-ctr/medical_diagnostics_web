@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Мои записи</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Врач</th>
+                <th>Услуга</th>
+                <th>Статус</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appointment in appointments %}
+            <tr>
+                <td>{{ appointment.appointment_date|date:"d.m.Y H:i" }}</td>
+                <td>{{ appointment.doctor.user.get_full_name }}</td>
+                <td>{{ appointment.service.name }}</td>
+                <td>{{ appointment.get_status_display }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'appointments:create' %}" class="btn btn-primary">Новая запись</a>
+</div>
+{% endblock %}

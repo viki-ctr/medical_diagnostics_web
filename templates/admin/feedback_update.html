@@ -1,0 +1,48 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Редактирование отзыва #{{ feedback.id }}</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label">Имя:</label>
+                    <input type="text" class="form-control" value="{{ feedback.name }}" readonly>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Email:</label>
+                    <input type="text" class="form-control" value="{{ feedback.email }}" readonly>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Тема:</label>
+                    <input type="text" class="form-control" value="{{ feedback.subject }}" readonly>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Сообщение:</label>
+                    <textarea class="form-control" rows="4" readonly>{{ feedback.message }}</textarea>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="is_processed"
+                           name="is_processed" {% if feedback.is_processed %}checked{% endif %}>
+                    <label class="form-check-label" for="is_processed">Обработан</label>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'contacts:feedback-list' %}" class="btn btn-secondary">
+                        Назад к списку
+                    </a>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

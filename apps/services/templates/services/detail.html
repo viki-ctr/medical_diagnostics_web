@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'services:list' %}">Диагностика</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'services:list_by_category' service.category.slug %}">{{ service.category.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ service.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4 border-0 shadow-sm">
+                {% if service.image %}
+                <img src="{{ service.image.url }}" class="card-img-top" alt="{{ service.name }}">
+                {% endif %}
+                <div class="card-body">
+                    <h1 class="card-title mb-3">{{ service.name }}</h1>
+
+                    <div class="medical-info mb-4">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="info-item">
+                                    <i class="fas fa-clock text-primary me-2"></i>
+                                    <strong>Длительность:</strong> {{ service.duration_formatted }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="info-item">
+                                    <i class="fas fa-procedures text-primary me-2"></i>
+                                    <strong>Подготовка:</strong>
+                                    {% if service.preparation_required %}
+                                        Требуется
+                                    {% else %}
+                                        Не требуется
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="info-item">
+                                    <i class="fas fa-file-medical text-primary me-2"></i>
+                                    <strong>Результаты:</strong> {{ service.results_time }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <h4><i class="fas fa-info-circle text-primary me-2"></i>Описание исследования</h4>
+                        <div class="ps-4">
+                            {{ service.description|linebreaks }}
+                        </div>
+                    </div>
+
+                    {% if service.indications %}
+                    <div class="mb-5">
+                        <h4><i class="fas fa-check-circle text-primary me-2"></i>Показания</h4>
+                        <div class="ps-4">
+                            {{ service.indications|linebreaks }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if service.preparation %}
+                    <div class="mb-5">
+                        <h4><i class="fas fa-clipboard-check text-primary me-2"></i>Подготовка к исследованию</h4>
+                        <div class="ps-4">
+                            {{ service.preparation|linebreaks }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'appointments:create' %}?service={{ service.id }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-calendar-check me-2"></i>Записаться на исследование
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            {% if service.contraindications %}
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Противопоказания
+                </div>
+                <div class="card-body">
+                    {{ service.contraindications|linebreaks }}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <i class="fas fa-microscope me-2"></i>Похожие исследования
+                </div>
+                <div class="list-group list-group-flush">
+                    {% for related in related_services %}
+                    <a href="{% url 'services:detail' related.slug %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ related.name }}</h6>
+                            <small class="text-primary">{{ related.price }} ₽</small>
+                        </div>
+                        <small class="text-muted">{{ related.category.name }}</small>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <i class="fas fa-user-md me-2"></i>Консультация специалиста
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Не знаете, какое исследование вам нужно?</p>
+                    <a href="/consult/">Получить консультацию</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

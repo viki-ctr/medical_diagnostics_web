@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                <h1 class="text-center mb-4">Часто задаваемые вопросы</h1>
+                <p class="text-center text-muted mb-5">Здесь вы найдете ответы на наиболее распространенные вопросы</p>
+
+                {% if categories %}
+                    {% for category in categories %}
+                    <div class="card mb-4 border-0 shadow-sm">
+                        <div class="card-header bg-primary text-white py-3">
+                            <h2 class="h5 mb-0">
+                                <i class="fas fa-folder-open me-2"></i>{{ category.name }}
+                                {% if category.description %}
+                                <small class="d-block mt-1 fs-6 fw-light">{{ category.description }}</small>
+                                {% endif %}
+                            </h2>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="accordion accordion-flush" id="accordionCategory{{ category.id }}">
+                                {% for faq in faqs %}
+                                    {% if faq.category_id == category.id %}
+                                    <div class="accordion-item border-bottom">
+                                        <h3 class="accordion-header" id="heading{{ faq.id }}">
+                                            <button class="accordion-button collapsed py-3" type="button"
+                                                    data-bs-toggle="collapse" data-bs-target="#collapse{{ faq.id }}"
+                                                    aria-expanded="false" aria-controls="collapse{{ faq.id }}">
+                                                <i class="fas fa-question-circle text-primary me-2"></i>
+                                                {{ faq.question }}
+                                            </button>
+                                        </h3>
+                                        <div id="collapse{{ faq.id }}" class="accordion-collapse collapse"
+                                             aria-labelledby="heading{{ faq.id }}"
+                                             data-bs-parent="#accordionCategory{{ category.id }}">
+                                            <div class="accordion-body pt-0">
+                                                <div class="faq-answer">
+                                                    {{ faq.answer|safe }}
+                                                </div>
+                                                {% if faq.updated_at %}
+                                                <div class="text-end text-muted small mt-2">
+                                                    Обновлено: {{ faq.updated_at|date:"d.m.Y" }}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                {% empty %}
+                                    <div class="text-center py-4">
+                                        <p class="text-muted">В этой категории пока нет вопросов</p>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Раздел вопросов и ответов находится в разработке
+                        </div>
+                    </div>
+                {% endif %}
+
+                <div class="text-center mt-5">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body py-4">
+                            <h3 class="h5 mb-3">Не нашли ответ на свой вопрос?</h3>
+                            <a href="{% url 'contacts:contact-info' %}" class="btn btn-primary px-4">
+                                <i class="fas fa-paper-plane me-2"></i>Написать нам
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

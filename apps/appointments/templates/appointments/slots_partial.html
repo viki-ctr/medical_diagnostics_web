@@ -1,0 +1,28 @@
+<div class="time-slots-container">
+    {% if slots %}
+        <h5>Доступные время на {{ date }}:</h5>
+        <div class="btn-group-vertical" role="group">
+            {% for slot in slots %}
+                <button type="button" class="btn btn-outline-primary time-slot-btn"
+                        data-time="{{ slot }}">
+                    {{ slot }}
+                </button>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-warning">
+            Нет доступных слотов для записи на выбранную дату
+        </div>
+    {% endif %}
+</div>
+
+<script>
+document.querySelectorAll('.time-slot-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const time = this.dataset.time;
+        document.getElementById('id_appointment_date').value = `{{ date }}T${time}`;
+        this.classList.remove('btn-outline-primary');
+        this.classList.add('btn-primary');
+    });
+});
+</script>

@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="hero-section" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{% static 'images/testimonials-bg.jpg' %}'); background-size: cover; background-position: center; background-attachment: fixed;">
+    <div class="container py-5 text-center text-white">
+        <h1 class="display-4 fw-bold mb-3">Отзывы пациентов</h1>
+        <p class="lead mb-0">Что говорят о нас наши пациенты</p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                {% if testimonials %}
+                <div class="testimonials-list">
+                    {% for testimonial in testimonials %}
+                    <div class="card border-0 shadow-sm mb-4 hover-shadow transition-all" itemscope itemtype="http://schema.org/Review">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-start">
+                                {% if testimonial.photo %}
+                                <img src="{{ testimonial.photo.url }}" class="rounded-circle me-4 flex-shrink-0" width="80" height="80" alt="{{ testimonial.author }}" loading="lazy" itemprop="image">
+                                {% else %}
+                                <div class="rounded-circle me-4 flex-shrink-0 bg-light d-flex align-items-center justify-content-center" style="width:80px; height:80px;">
+                                    <i class="fas fa-user fa-2x text-muted"></i>
+                                </div>
+                                {% endif %}
+                                <div class="flex-grow-1">
+                                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-2">
+                                        <div>
+                                            <h5 class="card-title mb-1" itemprop="author" itemscope itemtype="http://schema.org/Person">
+                                                <span itemprop="name">{{ testimonial.author }}</span>
+                                            </h5>
+                                            {% if testimonial.position %}
+                                            <p class="text-muted small mb-0" itemprop="jobTitle">{{ testimonial.position }}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="text-warning mt-2 mt-md-0" itemprop="reviewRating" itemscope itemtype="http://schema.org/Rating">
+                                            <meta itemprop="ratingValue" content="{{ testimonial.rating }}">
+                                            <meta itemprop="bestRating" content="5">
+                                            {% for i in "12345" %}
+                                                {% if forloop.counter <= testimonial.rating %}
+                                                    <i class="fas fa-star"></i>
+                                                {% else %}
+                                                    <i class="far fa-star"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="card-text mb-3" itemprop="reviewBody">
+                                        {{ testimonial.content|linebreaks }}
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="badge bg-primary-light text-primary">
+                                            <i class="far fa-calendar-alt me-1"></i>
+                                            <span itemprop="datePublished">{{ testimonial.created_at|date:"d.m.Y" }}</span>
+                                        </span>
+                                        {% if testimonial.doctor %}
+                                        <span class="badge bg-info-light text-dark">
+                                            <i class="fas fa-user-md me-1"></i>
+                                            {{ testimonial.doctor.name }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Пока нет отзывов. Будьте первым!
+                    </div>
+                    <a href="{% url 'core:testimonial_list' %}" class="btn btn-primary">
+                        <i class="fas fa-pen me-1"></i> Оставить отзыв
+                    </a>
+                </div>
+                {% endif %}
+
+                {% if is_paginated %}
+                <nav aria-label="Page navigation" class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1" aria-label="First">
+                                <span aria-hidden="true">&laquo;&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

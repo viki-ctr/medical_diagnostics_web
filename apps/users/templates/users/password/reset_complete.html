@@ -1,0 +1,10 @@
+{% extends "users/base_account.html" %}
+
+{% block account_title %}Пароль изменен{% endblock %}
+
+{% block account_content %}
+<div class="alert alert-success">
+    Ваш пароль успешно изменен. Теперь вы можете войти.
+</div>
+<a href="{% url 'users:login' %}" class="btn btn-primary">Войти</a>
+{% endblock %}

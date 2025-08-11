@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    {% if home_content %}
+    <section class="hero-section">
+        <h1>{{ home_content.main_title }}</h1>
+        <p>{{ home_content.main_description }}</p>
+        {% if home_content.featured_image %}
+        <img src="{{ home_content.featured_image.url }}" style="height: 700px; object-fit: contain;" alt="Главное изображение">
+        {% endif %}
+    </section>
+    {% endif %}
+
+    <!-- Отзывы -->
+    <section class="testimonials">
+        <h2>{{ home_content.testimonials_title|default:"Отзывы наших пациентов" }}</h2>
+        <div class="testimonial-grid">
+            {% for testimonial in testimonials %}
+            <div class="testimonial-card">
+                <div class="rating">{{ testimonial.stars }}</div>
+                <p>{{ testimonial.content }}</p>
+                <div class="author">
+                    {% if testimonial.photo %}
+                    <img src="{{ testimonial.photo.url }}" alt="{{ testimonial.author }}">
+                    {% endif %}
+                    <div>
+                        <strong>{{ testimonial.author }}</strong>
+                        {% if testimonial.position %}<br>{{ testimonial.position }}{% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}
